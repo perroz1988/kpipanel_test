@@ -159,6 +159,8 @@ html,body { margin:0; padding:0; background:var(--bg); color:var(--text); font-f
 .refresh-cta .spin-ic { font-size:15px; }
 .refresh-cta-sm { display:inline-flex; align-items:center; gap:6px; background:var(--li-blue); color:#fff; border:none; padding:6px 12px; border-radius:6px; font-weight:600; font-size:12px; cursor:pointer; }
 .refresh-cta-sm:hover { background:var(--li-blue-dark); }
+.logout-btn { display:inline-flex; align-items:center; gap:5px; background:transparent; color:var(--text-3); border:1px solid var(--border); padding:6px 12px; border-radius:6px; font-weight:600; font-size:12px; cursor:pointer; }
+.logout-btn:hover { background:oklch(40% 0.19 25 / 0.08); color:var(--neg); border-color:oklch(40% 0.19 25 / 0.3); }
 .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--text); color:#fff; padding:14px 20px; border-radius:10px; font-size:13px; box-shadow:0 4px 16px rgba(0,0,0,.2); opacity:0; transition:all .25s; pointer-events:none; max-width:520px; line-height:1.5; z-index:1000; }
 .toast.show { opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
 .toast.success { background:var(--pos); }
@@ -379,6 +381,7 @@ fetch('/api/auth/verify')
       <div style="margin-top:8px;display:flex;gap:6px;justify-content:flex-end;align-items:center;flex-wrap:wrap">
         <button class="print-cta" id="printBtn" title="Genera un PDF multipagina con tutte le tab e il periodo selezionato">⎙ Stampa PDF</button>
         <button class="refresh-cta-sm" id="refreshTopBtn" title="Rigenera la dashboard con i nuovi Excel nella cartella">↻ Aggiorna dati</button>
+        <button class="logout-btn" id="logoutBtn" title="Esci">⏻ Esci</button>
       </div>
     </div>
   </div>
@@ -1908,6 +1911,10 @@ async function copyRefreshPrompt(){
 document.getElementById('refreshTopBtn').addEventListener('click', copyRefreshPrompt);
 document.getElementById('refreshMainBtn').addEventListener('click', copyRefreshPrompt);
 document.getElementById('printBtn').addEventListener('click', printDashboard);
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  await fetch('/api/auth/logout', { method: 'POST' });
+  location.replace('/login');
+});
 
 /* ============ GUIDE TOGGLE (collapsibile) ============ */
 (function(){
