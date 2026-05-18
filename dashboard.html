@@ -349,7 +349,17 @@ body.print-mode .row-4, body.print-mode .card, body.print-mode .kpi { break-insi
 <style id="auth-veil">html{visibility:hidden}</style>
 <script>
 fetch('/api/auth/verify')
-  .then(r => { if (!r.ok) throw 0; document.getElementById('auth-veil').remove(); })
+  .then(r => { if (!r.ok) throw 0; return r.json(); })
+  .then(u => {
+    document.getElementById('auth-veil').remove();
+    if (u.role !== 'admin') {
+      document.getElementById('guide').style.display = 'none';
+      const keyeTab = document.querySelector('.tab[data-tab="keye"]');
+      if (keyeTab) keyeTab.style.display = 'none';
+      const keyeContent = document.getElementById('tab-keye');
+      if (keyeContent) keyeContent.style.display = 'none';
+    }
+  })
   .catch(() => location.replace('/login?next=' + encodeURIComponent(location.pathname)));
 </script>
 </head>

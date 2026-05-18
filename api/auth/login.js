@@ -35,7 +35,7 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Credenziali non valide' });
   }
 
-  const token = await new SignJWT({ sub: user.id, email: user.email, name: user.name })
+  const token = await new SignJWT({ sub: user.id, email: user.email, name: user.name, role: user.role })
     .setProtectedHeader({ alg: 'HS256' })
     .setExpirationTime('7d')
     .sign(JWT_SECRET);
