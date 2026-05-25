@@ -547,6 +547,7 @@ fetch('/api/auth/verify')
   <!-- TAB 2: AUDIENCE -->
   <div class="tab-content" id="tab-audience" data-print-title="Audience / Fan Base">
     <div class="print-section-header"></div>
+    <div class="kpi-row" id="kpiAudience" style="grid-template-columns:repeat(3,1fr)"></div>
     <div class="helper">Quote calcolate sulla fan base totale: <b id="fanTot">—</b> follower (somma da export Anzianità).</div>
     <div class="row-3">
       <div class="card">
@@ -599,7 +600,7 @@ fetch('/api/auth/verify')
       <div class="period-range" id="contCount">—</div>
       <button class="btn" style="margin-left:auto" onclick="exportPostsCSV()" title="Scarica la lista post corrente come file CSV">⬇ CSV</button>
     </div>
-    <div class="kpi-row" id="kpiContenuti" style="grid-template-columns:repeat(4,1fr)"></div>
+    <div class="kpi-row" id="kpiContenuti" style="grid-template-columns:repeat(5,1fr)"></div>
     <div class="card">
       <h3>Lista Post <span class="hint">click su una riga per il drill-down</span></h3>
       <div style="overflow-x:auto"><table class="tbl" id="postsTable">
@@ -636,7 +637,7 @@ fetch('/api/auth/verify')
   <div class="tab-content" id="tab-campagne" data-print-title="Campagne Adv">
     <div class="print-section-header"></div>
     <div class="helper" id="campPeriodBar">—</div>
-    <div class="kpi-row" id="kpiCampagne" style="grid-template-columns:repeat(5,1fr)"></div>
+    <div class="kpi-row" id="kpiCampagne" style="grid-template-columns:repeat(6,1fr)"></div>
     <div class="row-2" style="margin-bottom:20px">
       <div class="card">
         <h3>Spesa per campagna <span class="hint">GBP · ordinata per importo</span></h3>
@@ -1098,6 +1099,35 @@ function renderAudience(){
   const folCls  = folDiff >= 0 ? 'var(--pos)' : 'var(--neg)';
   const folArr  = folDiff >= 0 ? '↑' : '↓';
 
+  // KPI row audience
+  const rAud   = getRange();
+  const fAud   = followersIn(rAud);
+  const fAudP  = followersIn(getPrevRange(rAud));
+  const newFolPeriod  = fAud.reduce((s,x)=>s+x.tot,0);
+  const newFolPeriodP = fAudP.reduce((s,x)=>s+x.tot,0);
+  const hasPrevAud    = fAudP.length > 0;
+  const deltaNF  = hasPrevAud ? newFolPeriod - newFolPeriodP : null;
+  const fanTotPrevVal = RS_DATA.meta.fan_base_totale_prev || 0;
+  const cresPct  = fanTotPrevVal > 0 ? ((RS_DATA.meta.fan_base_totale - fanTotPrevVal) / fanTotPrevVal * 100) : null;
+  document.getElementById('kpiAudience').innerHTML = [
+    { lbl:'Fan Base Totale',
+      val: fmt(RS_DATA.meta.fan_base_totale),
+      prevVal: fanTotPrevVal > 0 ? fmt(fanTotPrevVal) : null,
+      delta: fanTotPrevVal > 0 ? deltaCard(RS_DATA.meta.fan_base_totale, fanTotPrevVal) : null },
+    { lbl:'Nuovi Follower nel Periodo',
+      val: `+${fmt(newFolPeriod)}`,
+      prevVal: hasPrevAud ? `+${fmt(newFolPeriodP)}` : null,
+      delta: deltaNF !== null ? { txt:`${deltaNF>=0?'↑':'↓'} ${deltaNF>=0?'+':''}${fmt(deltaNF)}`, cls:deltaNF>=0?'pos':'neg', pctTxt:'vs periodo prec.' } : null },
+    { lbl:'Crescita % Fan Base',
+      val: cresPct !== null ? `+${nfDec.format(cresPct)}%` : '—',
+      prevVal: null,
+      delta: cresPct !== null ? { txt: cresPct>=0?'↑ in crescita':'↓ in calo', cls: cresPct>=0?'pos':'neg', pctTxt:'rispetto al periodo precedente' } : null },
+  ].map(c=>{
+    const prev  = c.prevVal != null ? `<div class="prev-val">periodo prec. <b>${c.prevVal}</b></div>` : '';
+    const delta = c.delta ? `<div class="delta ${c.delta.cls}">${c.delta.txt} <span style="color:var(--text-3);font-weight:400">· ${c.delta.pctTxt}</span></div>` : '';
+    return `<div class="kpi"><div class="label">${c.lbl}</div><div class="value">${c.val}</div>${prev}${delta}</div>`;
+  }).join('');
+
   const fanDeltaHtml = hasPrev
     ? `nuovi sett. corrente <b style="color:var(--text)">+${fmt(folCurr)}</b> &nbsp;·&nbsp; sett. prec. <b style="color:var(--text-2)">+${fmt(folPrev)}</b> &nbsp;<span style="color:${folCls};font-weight:700">${folArr} ${folSign}${fmt(folDiff)}</span>`
     : `nuovi questa settimana: <b>+${fmt(folCurr)}</b>`;
@@ -1208,6 +1238,7 @@ function renderContenuti(r){
       pedn: arr.length>0 ? eng/arr.length : 0,
       impAvg: arr.length>0 ? imp/arr.length : 0,
       ctrAvg: imp>0 ? cl/imp*100 : 0,
+      erAvg:  imp>0 ? eng/imp*100 : 0,
     };
   }
   const m = calcM(pool);
@@ -1228,6 +1259,9 @@ function renderContenuti(r){
     { lbl:'CTR medio', val: fmtPct(m.ctrAvg),
       prevVal: hasPrev && mp.ctrAvg>0 ? fmtPct(mp.ctrAvg) : null,
       delta: hasPrev && mp.ctrAvg>0 ? { txt:`${m.ctrAvg>=mp.ctrAvg?'↑':'↓'} ${nfDec.format(Math.abs(m.ctrAvg-mp.ctrAvg))} pp`, cls:m.ctrAvg>=mp.ctrAvg?'pos':'neg', pctTxt:'pp vs periodo prec.' } : null },
+    { lbl:'Engagement Rate', val: fmtPct(m.erAvg),
+      prevVal: hasPrev && mp.erAvg>0 ? fmtPct(mp.erAvg) : null,
+      delta: hasPrev && mp.erAvg>0 ? { txt:`${m.erAvg>=mp.erAvg?'↑':'↓'} ${nfDec.format(Math.abs(m.erAvg-mp.erAvg))} pp`, cls:m.erAvg>=mp.erAvg?'pos':'neg', pctTxt:'pp vs periodo prec.' } : null },
   ];
   document.getElementById('kpiContenuti').innerHTML = cards.map(c=>{
     const prev  = c.prevVal != null ? `<div class="prev-val">sett. prec. <b>${c.prevVal}</b></div>` : '';
@@ -1415,11 +1449,12 @@ function renderCampagne(){
   const list   = Object.values(agg).sort((a,b)=>b.spent-a.spent);
   const active = list.filter(c=>c.spent>0||c.impressions>0);
 
-  const totSpent = active.reduce((s,c)=>s+c.spent,0);
-  const totImp   = active.reduce((s,c)=>s+c.impressions,0);
-  const totReach = active.reduce((s,c)=>s+c.reach,0);
-  const totClick = active.reduce((s,c)=>s+c.clicks,0);
-  const totConv  = active.reduce((s,c)=>s+c.conversions,0);
+  const totSpent   = active.reduce((s,c)=>s+c.spent,0);
+  const totImp     = active.reduce((s,c)=>s+c.impressions,0);
+  const totReach   = active.reduce((s,c)=>s+c.reach,0);
+  const totClick   = active.reduce((s,c)=>s+c.clicks,0);
+  const totConv    = active.reduce((s,c)=>s+c.conversions,0);
+  const totFollows = active.reduce((s,c)=>s+c.follows,0);
   const ctrW     = totImp>0 ? totClick/totImp*100 : 0;
   const cpcAvg   = totClick>0 ? totSpent/totClick : 0;
 
@@ -1427,11 +1462,12 @@ function renderCampagne(){
     `<b>${active.length}</b> campagne con erogazione nel periodo · report completo: ${fmtDate(m.report_start)} → ${fmtDate(m.report_end)} · ${m.currency}`;
 
   document.getElementById('kpiCampagne').innerHTML = [
-    { lbl:'Spesa Periodo',  val:`£ ${nfDec.format(totSpent)}` },
-    { lbl:'Reach Periodo',  val: fmt(totReach) },
-    { lbl:'CTR Pesato',     val: fmtPct(ctrW) },
-    { lbl:'CPC Medio',      val: totClick>0?`£ ${nfDec.format(cpcAvg)}`:'—' },
-    { lbl:'Conversioni',    val: fmt(totConv) },
+    { lbl:'Spesa Periodo',        val:`£ ${nfDec.format(totSpent)}` },
+    { lbl:'Reach Periodo',        val: fmt(totReach) },
+    { lbl:'CTR Pesato',           val: fmtPct(ctrW) },
+    { lbl:'CPC Medio',            val: totClick>0?`£ ${nfDec.format(cpcAvg)}`:'—' },
+    { lbl:'Conversioni',          val: fmt(totConv) },
+    { lbl:'Follower Guadagnati',  val: totFollows>0?`+${fmt(totFollows)}`:'—' },
   ].map(c=>`<div class="kpi"><div class="label">${c.lbl}</div><div class="value">${c.val}</div></div>`).join('');
 
   // Chart spesa
