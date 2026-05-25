@@ -1010,7 +1010,8 @@ function renderGenerale(r){
 
   const er = sums.impressioni_org>0 ? (sums.reazioni_org+sums.commenti_org+sums.diffusioni_org)/sums.impressioni_org*100 : 0;
   const erPrev = sumsPrev.impressioni_org>0 ? (sumsPrev.reazioni_org+sumsPrev.commenti_org+sumsPrev.diffusioni_org)/sumsPrev.impressioni_org*100 : null;
-  const erSimple = m.length>0 ? m.reduce((s,x)=>s+(x.impressioni_org>0?(x.reazioni_org+x.commenti_org+x.diffusioni_org)/x.impressioni_org*100:0),0)/m.length : 0;
+  const postsR = postsOrgAll().filter(p=>p.data_creazione && inRange(p.data_creazione, r));
+  const erSimple = postsR.length>0 ? postsR.reduce((s,p)=>s+(p.impressioni>0?(p.reazioni+p.commenti+p.diffusioni)/p.impressioni*100:0),0)/postsR.length : 0;
 
   const ctrCamp = sums.impressioni_spon>0 ? sums.clic_spon/sums.impressioni_spon*100 : 0;
   const ctrCampPrev = sumsPrev.impressioni_spon>0 ? sumsPrev.clic_spon/sumsPrev.impressioni_spon*100 : null;
@@ -1028,7 +1029,7 @@ function renderGenerale(r){
     { lbl:'Crescita Settimanale', val: `+${fmt(cresWeek)}`, prevVal: null, delta:{ txt:`+${nfDec.format(cresWeekPct)}% sul totale`, cls:'pos', pctTxt:'ultimi 7 giorni' } },
     { lbl:'Crescita Mensile', val: `+${fmt(cresMonth)}`, prevVal: null, delta:{ txt:`+${nfDec.format(cresMonthPct)}% sul totale`, cls:'pos', pctTxt:'ultimi 30 giorni (max disp.)' } },
     { lbl:'ER Ponderata (Org)', val: fmtPct(er),
-      hint:'Ponderata: (Σ reaz+comm+diff) / Σ impressioni × 100\nSemplice: media delle ER giornaliere',
+      hint:'Ponderata: (Σ reaz+comm+diff) / Σ impressioni × 100\nSemplice: media delle ER per singolo post organico',
       sub: erSimple>0 ? `Media semplice: ${fmtPct(erSimple)}` : null,
       prevVal: erPrev!=null ? fmtPct(erPrev) : null,
       delta: erPrev!=null?{ ...deltaCard(er, erPrev), txt: `${er>=erPrev?'↑':'↓'} ${nfDec.format(Math.abs(er-erPrev))} pp`, cls:er>=erPrev?'pos':'neg', pctTxt:'pp vs periodo prec.' }:{ txt:'—', cls:'neutral', pctTxt:'storico insufficiente' } },
