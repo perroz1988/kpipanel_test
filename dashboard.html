@@ -529,7 +529,7 @@ fetch('/api/auth/verify')
     <div class="print-section-header"></div>
     <div class="kpi-row" id="kpiRow"></div>
     <div id="kpiKreinRow" style="margin-top:8px;padding:10px 14px;background:var(--surface-mid);border:1px solid var(--border);border-radius:8px;display:flex;gap:24px;flex-wrap:wrap;align-items:center">
-      <span style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap">Campagne Krein</span>
+      <span style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap">Campagne Krein · periodo report completo</span>
       <div id="kpiKreinCells" style="display:flex;gap:20px;flex-wrap:wrap"></div>
     </div>
     <div class="row-2">
@@ -1042,28 +1042,22 @@ function renderGenerale(r){
   const sums = sumCols(m, ['impressioni_org','impressioni_spon','impressioni_tot','clic_tot','clic_org','clic_spon','reazioni_org','commenti_org','diffusioni_org']);
   const sumsPrev = sumCols(mPrev, ['impressioni_org','impressioni_spon','impressioni_tot','clic_tot','clic_org','clic_spon','reazioni_org','commenti_org','diffusioni_org']);
 
-  // Totali campagne Krein (da CAMP_DATA, già filtrato)
+  // Totali campagne Krein — aggregati periodo report (non filtrabile per settimana)
   const camp = (CAMP_DATA.daily||[]).reduce((a,x)=>{
     a.imp+=x.impressions||0; a.clicks+=x.clicks||0; a.spent+=x.spent||0;
     a.reactions+=x.reactions||0; a.reach+=x.reach||0; a.leads+=x.leads||0; return a;
   }, {imp:0,clicks:0,spent:0,reactions:0,reach:0,leads:0});
 
-  // KPI combinati: organico + campagne Krein
-  const impCombined     = sums.impressioni_org + camp.imp;
-  const impCombinedPrev = sumsPrev.impressioni_org; // prev: solo org (no camp prev disponibile)
-  const clicCombined    = sums.clic_org + camp.clicks;
-  const clicCombinedPrev= sumsPrev.clic_org;
-  const reactCombined   = sums.reazioni_org + camp.reactions;
-  const reactCombinedPrev= sumsPrev.reazioni_org;
-
-  const er = impCombined>0 ? (reactCombined+sums.commenti_org+sums.diffusioni_org)/impCombined*100 : 0;
-  const erPrev = impCombinedPrev>0 ? (reactCombinedPrev+sumsPrev.commenti_org+sumsPrev.diffusioni_org)/impCombinedPrev*100 : null;
+  // KPI grandi = solo ORGANICO (filtrabile per periodo → confronto corretto)
+  // Paid Krein mostrato separatamente nella riga sotto (aggregato, non filtrabile)
+  const er = sums.impressioni_org>0
+    ? (sums.reazioni_org+sums.commenti_org+sums.diffusioni_org)/sums.impressioni_org*100 : 0;
+  const erPrev = sumsPrev.impressioni_org>0
+    ? (sumsPrev.reazioni_org+sumsPrev.commenti_org+sumsPrev.diffusioni_org)/sumsPrev.impressioni_org*100 : null;
   const postsR = postsTotaleAll().filter(p=>p.data_creazione && inRange(p.data_creazione, r));
   const erSimple = postsR.length>0 ? postsR.reduce((s,p)=>s+(p.impressioni>0?(p.reazioni+p.commenti+p.diffusioni)/p.impressioni*100:0),0)/postsR.length : 0;
 
-  // CTR Krein (solo campagne nostre)
   const ctrCamp = camp.imp>0 ? camp.clicks/camp.imp*100 : 0;
-  const ctrCampPrev = null; // camp prev non disponibile per periodo
 
   // Crescita settimanale e mensile (sul totale storico, finestre fisse)
   const allF = RS_DATA.followers_daily.slice().sort((a,b)=>a.data.localeCompare(b.data));
@@ -1078,21 +1072,21 @@ function renderGenerale(r){
     { lbl:'Crescita Settimanale', val: `+${fmt(cresWeek)}`, prevVal: null, delta:{ txt:`+${nfDec.format(cresWeekPct)}% sul totale`, cls:'pos', pctTxt:'ultimi 7 giorni' } },
     { lbl:'Crescita Mensile', val: `+${fmt(cresMonth)}`, prevVal: null, delta:{ txt:`+${nfDec.format(cresMonthPct)}% sul totale`, cls:'pos', pctTxt:'ultimi 30 giorni (max disp.)' } },
     { lbl:'Engagement Rate', val: erSimple>0 ? fmtPct(erSimple) : fmtPct(er),
-      hint:'Calcolato su organico + campagne Krein\nSemplice: media ER per post · Ponderata: (Σ reaz+comm+diff) / Σ impressioni × 100',
+      hint:'Solo post organici del piano editoriale.\nSemplice: media ER per singolo post\nPonderata: (Σ reaz+comm+diff) / Σ impressioni × 100',
       sub: erSimple>0 ? `Ponderata: ${fmtPct(er)}` : null,
       prevVal: erPrev!=null ? fmtPct(erPrev) : null,
       delta: erPrev!=null?{ txt: `${er>=erPrev?'↑':'↓'} ${nfDec.format(Math.abs(er-erPrev))} pp`, cls:er>=erPrev?'pos':'neg', pctTxt:'pp vs periodo prec.' }:{ txt:'—', cls:'neutral', pctTxt:'storico insufficiente' } },
     { lbl:'CTR Krein', val: fmtPct(ctrCamp),
-      hint:'Click / Impressioni campagne Krein',
-      prevVal: null, delta:{ txt:'—', cls:'neutral', pctTxt:'dato aggregato periodo' } },
-    { lbl:'Impressioni Periodo', val: fmt(impCombined),
-      hint:'Perimetro: post organici piano editoriale + campagne Krein.\nEscluse campagne di altri team (Energy Efficiency, RS Group, EMEA).\nNota: paid Krein = totale periodo report (non filtrabile per settimana senza export giornaliero).',
-      prevVal: hasPrevG ? fmt(impCombinedPrev) : null,
-      delta: deltaCard(impCombined, impCombinedPrev) },
-    { lbl:'Clic Periodo', val: fmt(clicCombined),
-      hint:'Perimetro: organici + campagne Krein.\nEscluse campagne di altri team.',
-      prevVal: hasPrevG ? fmt(clicCombinedPrev) : null,
-      delta: deltaCard(clicCombined, clicCombinedPrev) },
+      hint:'Click / Impressioni campagne Krein (periodo report completo)',
+      prevVal: null, delta:{ txt:'aggregato periodo', cls:'neutral', pctTxt:'vedi riga Krein sotto' } },
+    { lbl:'Impressioni Organiche', val: fmt(sums.impressioni_org),
+      hint:'Solo post organici — filtrabile per periodo.\nPaid Krein mostrato separatamente nella riga sotto.\nEscluse campagne di altri team (Energy Efficiency, RS Group, EMEA).',
+      prevVal: hasPrevG ? fmt(sumsPrev.impressioni_org) : null,
+      delta: deltaCard(sums.impressioni_org, sumsPrev.impressioni_org) },
+    { lbl:'Clic Organici', val: fmt(sums.clic_org),
+      hint:'Solo clic da post organici — filtrabile per periodo.\nPaid Krein mostrato separatamente.',
+      prevVal: hasPrevG ? fmt(sumsPrev.clic_org) : null,
+      delta: deltaCard(sums.clic_org, sumsPrev.clic_org) },
   ];
   document.getElementById('kpiRow').innerHTML = cards.map(c=>{
     const prev  = c.prevVal != null ? `<div class="prev-val">${prevLabel()} <b>${c.prevVal}</b></div>` : '';
