@@ -35,7 +35,10 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Credenziali non valide' });
   }
 
-  const token = await new SignJWT({ sub: user.id, email: user.email, name: user.name, role: user.role })
+  const token = await new SignJWT({
+    sub: user.id, email: user.email, name: user.name,
+    role: user.role, dashboard: user.dashboard ?? 'rs-italia'
+  })
     .setProtectedHeader({ alg: 'HS256' })
     .setExpirationTime('7d')
     .sign(JWT_SECRET);
@@ -46,5 +49,5 @@ export default async function handler(req, res) {
   ]);
 
   res.setHeader('Set-Cookie', `kpi_session=${token}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${7 * 24 * 60 * 60}`);
-  res.status(200).json({ name: user.name });
+  res.status(200).json({ name: user.name, dashboard: user.dashboard ?? 'rs-italia' });
 }

@@ -1,6 +1,7 @@
 {
   "rewrites": [
     { "source": "/", "destination": "/dashboard.html" },
+    { "source": "/optimedia", "destination": "/optimedia.html" },
     { "source": "/login", "destination": "/login.html" }
   ],
   "headers": [

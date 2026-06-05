@@ -18,7 +18,7 @@ export default async function handler(req, res) {
 
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
-    res.status(200).json({ name: payload.name, email: payload.email, role: payload.role });
+    res.status(200).json({ name: payload.name, email: payload.email, role: payload.role, dashboard: payload.dashboard ?? 'rs-italia' });
   } catch {
     res.setHeader('Set-Cookie', 'kpi_session=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0');
     res.status(401).json({ error: 'Sessione scaduta' });

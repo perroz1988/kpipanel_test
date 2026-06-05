@@ -216,7 +216,9 @@ form.addEventListener('submit', async e => {
     }
 
     const params = new URLSearchParams(location.search);
-    location.href = params.get('next') || '/';
+    const next = params.get('next');
+    const dashMap = { 'optimedia': '/optimedia' };
+    location.href = next || dashMap[data.dashboard] || '/';
   } catch {
     err.textContent = 'Errore di rete. Riprova.';
     err.className = 'error visible';
