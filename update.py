@@ -1290,7 +1290,9 @@ def main():
         # 3. LinkedIn XLS → RS_DATA
         pairs = find_week_pairs()
         if not pairs:
-            print('\n✗ Nessuna coppia content/followers trovata in archive/linkedin/')
+            print('\n⚠  FILE MANCANTE: LinkedIn Analytics XLS non trovato.')
+            print('   → Scarica da LinkedIn Page Analytics (Contenuti + Follower)')
+            print(f'   → Metti in: inbox/rs-italia/')
             if not run_opt:
                 sys.exit(1)
         else:
@@ -1331,7 +1333,9 @@ def main():
                 except Exception as e:
                     print(f'  CAMP_DATA WARN: {e}')
             else:
-                print('  CAMP_DATA — (nessun CSV in archive/campagne/)')
+                print('  ⚠  FILE MANCANTE: Campaign Manager CSV')
+                print('     → Scarica da LinkedIn Campaign Manager → Reports → Ad Performance')
+                print(f'     → Metti in: inbox/rs-italia/')
 
             # Creative Performance (per-post paid data)
             creative_files = sorted(glob.glob(os.path.join(ARCHIVE_CAMPAGNE, '????-??-??_creative_performance.csv')))
@@ -1346,7 +1350,9 @@ def main():
                 except Exception as e:
                     print(f'  CREATIVE_DATA WARN: {e}')
             else:
-                print('  CREATIVE_DATA — (nessun creative_performance.csv in archive/campagne/)')
+                print('  ⚠  FILE MANCANTE: Creative Performance CSV')
+                print('     → Scarica da LinkedIn Campaign Manager → Reports → Creative Performance')
+                print(f'     → Rinomina/metti in: inbox/rs-italia/')
 
     # ══════════════════════════════════════════════════════════════
     # CLIENTE 2 — OPTIMEDIA
@@ -1366,6 +1372,15 @@ def main():
         # 2. Ricostruisci OPTIMEDIA_DATA dall'archivio
         fb_files = glob.glob(os.path.join(ARCHIVE_OPT_FB, '*.csv'))
         ig_files = glob.glob(os.path.join(ARCHIVE_OPT_IG, '*.csv'))
+
+        if not fb_files:
+            print('  ⚠  FILE MANCANTE: Facebook CSV')
+            print('     → Scarica da Meta Business Suite → Insight → Esporta')
+            print(f'     → Metti in: inbox/optimedia/Facebook/  (Views, Viewers, Interactions, Follows, Visits, Link clicks, Audience FB)')
+        if not ig_files:
+            print('  ⚠  FILE MANCANTE: Instagram CSV')
+            print('     → Scarica da Meta Business Suite → Insight → Esporta')
+            print(f'     → Metti in: inbox/optimedia/Instagram/  (Views, Reach, Interactions, Follows, Visits, Link clicks, Audience IG)')
 
         if fb_files or ig_files:
             print('\nAggiornamento optimedia.html...')
