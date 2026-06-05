@@ -49,11 +49,12 @@ from datetime import datetime
 BASE = os.path.dirname(os.path.abspath(__file__))
 
 # ── RS ITALIA ────────────────────────────────────────────────────────────────
-ARCHIVE          = os.path.join(BASE, 'archive', 'linkedin')
-ARCHIVE_KEYE     = os.path.join(BASE, 'archive', 'keye')
-ARCHIVE_CAMPAGNE = os.path.join(BASE, 'archive', 'campagne')
+ARCHIVE_RS       = os.path.join(BASE, 'archive', 'rs-italia')
+ARCHIVE          = os.path.join(BASE, 'archive', 'rs-italia', 'linkedin')
+ARCHIVE_KEYE     = os.path.join(BASE, 'archive', 'rs-italia', 'keye')
+ARCHIVE_CAMPAGNE = os.path.join(BASE, 'archive', 'rs-italia', 'campagne')
 ARCHIVE_PDF      = os.path.join(BASE, 'archive', 'pdf')
-ARCHIVE_ROOT     = os.path.join(BASE, 'archive')
+ARCHIVE_ROOT     = os.path.join(BASE, 'archive', 'rs-italia')
 TRASH            = os.path.join(BASE, '_trash')
 INBOX_RS         = os.path.join(BASE, 'inbox', 'rs-italia')
 INBOX            = INBOX_RS   # alias legacy
