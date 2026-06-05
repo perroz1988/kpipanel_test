@@ -3,17 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=1280">
-<title>Optimedia – Dashboard Social</title>
+<title>Optimedia – Meta Dashboard</title>
+<style id="auth-veil">html{visibility:hidden}</style>
 <style>
 :root {
   color-scheme: light;
   /* Platform colors */
   --fb: #1877F2;
-  --fb-dark: #0f5cc7;
-  --fb-lt: #E7F1FD;
+  --fb-dark: #0d5ec9;
+  --fb-lt: #e7f0fd;
   --ig: #E1306C;
-  --ig-dark: #b82257;
-  --ig-lt: #FDEEF3;
+  --ig-dark: #b81c53;
+  --ig-lt: #fce7ef;
   /* State semantics */
   --pos: oklch(36% 0.108 155);
   --neg: oklch(40% 0.19 25);
@@ -27,939 +28,1000 @@
   --text: oklch(18% 0.012 250);
   --text-2: oklch(48% 0.006 250);
   --text-3: oklch(60% 0.005 250);
-  /* Brand mark */
-  --brand-bg: oklch(44% 0.168 255.5);
-  /* Viral spike */
-  --spike-bg: oklch(97% 0.025 55);
-  --spike-border: oklch(82% 0.09 55);
-  --spike-text: oklch(38% 0.12 55);
+  /* Accent cross-platform */
+  --meta: #7B3FE4;
+  --meta-lt: #f0eafc;
+  /* Warn */
+  --warn-bg: oklch(97% 0.03 85);
+  --warn-border: oklch(80% 0.1 85);
 }
 * { box-sizing:border-box; }
 html,body { margin:0; padding:0; background:var(--bg); color:var(--text); font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; font-size:14px; }
 .app { min-width:1280px; max-width:1600px; margin:0 auto; padding:20px 28px 56px; }
 
-/* ── TOPBAR ── */
+/* Topbar */
 .topbar { display:flex; justify-content:space-between; align-items:center; gap:24px; padding-bottom:16px; border-bottom:1px solid var(--border); margin-bottom:20px; }
 .brand { display:flex; align-items:center; gap:12px; }
-.brand-logo { width:36px; height:36px; border-radius:6px; background:var(--brand-bg); color:#fff; font-weight:900; font-size:13px; display:flex; align-items:center; justify-content:center; letter-spacing:.5px; flex-shrink:0; }
+.brand-logo { width:36px; height:36px; border-radius:6px; background:linear-gradient(135deg,var(--fb),var(--ig)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:900; font-size:13px; flex-shrink:0; letter-spacing:.3px; }
 .brand h1 { font-size:16px; font-weight:700; margin:0; line-height:1.2; letter-spacing:-.2px; }
 .brand .sub { color:var(--text-3); font-size:12px; margin-top:1px; }
-.platform-badges { display:flex; gap:6px; align-items:center; }
-.plat-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:10px; font-size:11.5px; font-weight:700; }
-.plat-badge.fb { background:var(--fb-lt); color:var(--fb); }
-.plat-badge.ig { background:var(--ig-lt); color:var(--ig); }
-.topbar-right { display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
 .update { color:var(--text-3); font-size:12px; text-align:right; line-height:1.5; }
 .update b { color:var(--text-2); font-weight:600; }
-.logout-btn { display:inline-flex; align-items:center; gap:5px; background:transparent; color:var(--text-3); border:1px solid var(--border); padding:6px 12px; border-radius:6px; font-weight:600; font-size:12px; cursor:pointer; }
-.logout-btn:hover { background:oklch(40% 0.19 25 / 0.08); color:var(--neg); border-color:oklch(40% 0.19 25 / 0.3); }
+.logout-btn { display:inline-flex; align-items:center; gap:5px; background:transparent; color:var(--text-3); border:1px solid var(--border); padding:6px 12px; border-radius:6px; font-weight:600; font-size:12px; cursor:pointer; margin-top:8px; }
+.logout-btn:hover { background:rgba(204,16,22,.08); color:var(--neg); border-color:rgba(204,16,22,.3); }
 
-/* ── PERIOD BAR ── */
+/* Tabs */
+.tabs { display:flex; gap:0; border-bottom:1px solid var(--border); margin-bottom:20px; }
+.tab { padding:10px 16px; cursor:pointer; color:var(--text-3); font-weight:600; font-size:13px; border-bottom:2px solid transparent; user-select:none; transition:color .15s; }
+.tab:hover { color:var(--text-2); }
+.tab.active { color:var(--meta); border-bottom-color:var(--meta); }
+
+/* Period bar */
 .period-bar { display:flex; align-items:center; gap:12px; padding:8px 0 10px; margin-bottom:20px; border-bottom:1px solid var(--border-lt); }
 .period-tabs { display:inline-flex; background:var(--surface-mid); padding:3px; border-radius:8px; }
 .period-tab { padding:5px 13px; cursor:pointer; border-radius:6px; font-weight:600; color:var(--text-3); font-size:12.5px; transition:color .15s; }
-.period-tab.active { background:var(--card); color:var(--fb); box-shadow:0 1px 2px rgba(0,0,0,.06); }
-.period-range { color:var(--text-2); font-size:12px; margin-left:6px; }
+.period-tab.active { background:var(--card); color:var(--meta); box-shadow:0 1px 2px rgba(0,0,0,.06); }
+.period-range { color:var(--text-2); font-size:12px; }
 .period-custom { display:none; gap:8px; align-items:center; margin-left:auto; }
 .period-custom.show { display:inline-flex; }
-.period-custom input { padding:5px 8px; border:1px solid var(--border); border-radius:6px; font-size:13px; font-family:inherit; color:var(--text); background:var(--card); }
-.period-custom label { font-size:12px; color:var(--text-3); font-weight:600; }
-.period-custom button { padding:5px 12px; border:1px solid var(--fb); background:var(--fb); color:#fff; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; }
+.period-custom input { padding:6px 8px; border:1px solid var(--border); border-radius:6px; font-size:13px; }
+.btn { padding:8px 14px; border:1px solid var(--border); background:var(--card); border-radius:6px; cursor:pointer; font-weight:600; color:var(--text); font-size:13px; }
+.btn:hover { background:#F1F0EE; }
 
-/* ── KPI ── */
-.kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:20px; }
+/* KPI cards */
 .kpi { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:14px 16px 16px; min-height:100px; }
 .kpi .label { color:var(--text-3); font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.55px; display:flex; align-items:center; gap:4px; }
 .kpi .value { font-size:26px; font-weight:800; margin-top:5px; line-height:1.05; letter-spacing:-.5px; font-variant-numeric:tabular-nums; }
-.kpi .sub-val { font-size:11px; color:var(--text-3); margin-top:4px; font-variant-numeric:tabular-nums; }
-.kpi .sub-val b { color:var(--text-2); font-weight:600; }
+.kpi .sub-val { font-size:11px; color:var(--text-3); margin-top:3px; }
+.kpi .prev-val { font-size:11px; color:var(--text-3); margin-top:4px; font-variant-numeric:tabular-nums; }
+.kpi .prev-val b { color:var(--text-2); font-weight:600; }
+.kpi .delta { font-size:11.5px; margin-top:5px; display:flex; align-items:center; gap:3px; font-variant-numeric:tabular-nums; font-weight:600; }
+.kpi .delta.pos { color:var(--pos); }
+.kpi .delta.neg { color:var(--neg); }
+.kpi .delta.neutral { color:var(--text-3); font-weight:400; }
+
+/* Tooltip (i) */
 .kpi-info { display:inline-flex; align-items:center; justify-content:center; width:13px; height:13px; border-radius:50%; border:1.5px solid var(--text-3); color:var(--text-3); font-size:8px; font-weight:800; cursor:default; position:relative; flex-shrink:0; text-transform:none; letter-spacing:0; line-height:1; }
-.kpi-info:hover { border-color:var(--fb); color:var(--fb); }
+.kpi-info:hover { border-color:var(--meta); color:var(--meta); }
 .kpi-info .kpi-tip { display:none; position:absolute; bottom:calc(100% + 7px); left:50%; transform:translateX(-50%); background:#1D2226; color:#fff; font-size:11px; font-weight:400; line-height:1.5; white-space:pre-line; padding:8px 10px; border-radius:6px; width:220px; z-index:100; pointer-events:none; text-transform:none; letter-spacing:0; box-shadow:0 4px 16px rgba(0,0,0,.25); }
 .kpi-info .kpi-tip::after { content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:5px solid transparent; border-top-color:#1D2226; }
 .kpi-info:hover .kpi-tip { display:block; }
 
-/* ── TWO COLUMNS PLATFORM ── */
+/* Grid layouts */
+.kpi-row-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:20px; }
 .row-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+.row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:20px; }
+
+/* Platform sections */
+.platform-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
+.platform-col { border-radius:10px; overflow:hidden; border:1px solid var(--border); }
+.platform-header { padding:14px 16px 12px; display:flex; align-items:center; gap:10px; }
+.platform-header.fb { background:var(--fb-lt); border-bottom:2px solid var(--fb); }
+.platform-header.ig { background:var(--ig-lt); border-bottom:2px solid var(--ig); }
+.platform-icon { width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:13px; flex-shrink:0; }
+.platform-icon.fb { background:var(--fb); }
+.platform-icon.ig { background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); }
+.platform-title { font-size:14px; font-weight:700; }
+.platform-title.fb { color:var(--fb); }
+.platform-title.ig { color:var(--ig); }
+.platform-kpi-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; }
+.platform-kpi { padding:12px 14px 14px; border-right:1px solid var(--border-lt); border-bottom:1px solid var(--border-lt); background:var(--card); }
+.platform-kpi:nth-child(3n) { border-right:none; }
+.platform-kpi:nth-last-child(-n+3) { border-bottom:none; }
+.platform-kpi .lbl { color:var(--text-3); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; }
+.platform-kpi .val { font-size:20px; font-weight:800; margin-top:4px; letter-spacing:-.4px; font-variant-numeric:tabular-nums; }
+.platform-kpi .val.fb-color { color:var(--fb); }
+.platform-kpi .val.ig-color { color:var(--ig); }
+.platform-kpi .delta-sm { font-size:10.5px; margin-top:3px; font-weight:600; font-variant-numeric:tabular-nums; }
+.platform-kpi .delta-sm.pos { color:var(--pos); }
+.platform-kpi .delta-sm.neg { color:var(--neg); }
+.platform-kpi .delta-sm.neutral { color:var(--text-3); font-weight:400; }
+
+/* Cards */
 .card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:18px 20px; }
 .card h3 { margin:0 0 14px; font-size:12.5px; font-weight:700; color:var(--text-2); text-transform:uppercase; letter-spacing:.4px; }
+.card h3 .hint { font-weight:400; color:var(--text-3); font-size:11px; margin-left:6px; text-transform:none; letter-spacing:0; }
 
-/* Platform cards */
-.plat-header { display:flex; align-items:center; gap:10px; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--border-lt); }
-.plat-icon { width:32px; height:32px; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-weight:900; font-size:14px; }
-.plat-icon.fb { background:var(--fb); color:#fff; }
-.plat-icon.ig { background:linear-gradient(135deg,#E1306C,#F77737); color:#fff; }
-.plat-title { font-size:15px; font-weight:700; color:var(--text); }
-.plat-sub { font-size:11px; color:var(--text-3); margin-top:1px; }
-
-.plat-kpi-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
-.pk { background:var(--surface-mid); border-radius:6px; padding:10px 12px; }
-.pk .pk-lbl { font-size:10px; color:var(--text-3); font-weight:700; text-transform:uppercase; letter-spacing:.4px; }
-.pk .pk-val { font-size:19px; font-weight:800; margin-top:3px; letter-spacing:-.4px; font-variant-numeric:tabular-nums; }
-.pk .pk-val.fb-color { color:var(--fb); }
-.pk .pk-val.ig-color { color:var(--ig); }
-.pk .pk-sub { font-size:10.5px; color:var(--text-3); margin-top:2px; }
-
-/* ── CHART ── */
+/* Chart */
 .chart-wrap { position:relative; }
-.chart-wrap canvas { display:block; }
-.chart-tooltip { position:fixed; background:#1D2226; color:#fff; border-radius:7px; padding:10px 13px; font-size:12px; line-height:1.6; pointer-events:none; z-index:200; min-width:160px; box-shadow:0 4px 16px rgba(0,0,0,.25); }
-.chart-tooltip .tt-date { font-weight:700; font-size:11px; color:rgba(255,255,255,.6); margin-bottom:4px; letter-spacing:.3px; text-transform:uppercase; }
-.chart-tooltip .tt-row { display:flex; align-items:center; gap:6px; }
-.chart-tooltip .tt-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-.chart-tooltip .tt-lbl { color:rgba(255,255,255,.75); }
-.chart-tooltip .tt-v { font-weight:700; font-variant-numeric:tabular-nums; margin-left:auto; padding-left:12px; }
-.chart-legend { display:flex; gap:16px; margin-bottom:12px; flex-wrap:wrap; }
-.chart-legend .leg { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-2); }
-.chart-legend .leg-dot { width:10px; height:3px; border-radius:2px; flex-shrink:0; }
+canvas.trend-canvas { display:block; width:100%; }
 
-/* ── SPIKE ── */
-.spike-box { background:var(--spike-bg); border:1px solid var(--spike-border); border-radius:8px; padding:14px 18px; margin-bottom:20px; display:flex; align-items:flex-start; gap:14px; }
-.spike-icon { font-size:20px; flex-shrink:0; line-height:1.2; }
-.spike-body { flex:1; }
-.spike-title { font-weight:700; font-size:13.5px; color:var(--spike-text); margin-bottom:3px; }
-.spike-detail { font-size:12.5px; color:oklch(45% 0.1 55); line-height:1.5; }
-.spike-pills { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
-.spike-pill { display:inline-flex; align-items:center; gap:4px; background:#fff; border:1px solid var(--spike-border); border-radius:6px; padding:3px 10px; font-size:11.5px; font-weight:600; color:var(--spike-text); }
+/* Table */
+.tbl { width:100%; border-collapse:collapse; }
+.tbl th { text-align:left; font-size:10.5px; color:var(--text-3); text-transform:uppercase; letter-spacing:.45px; padding:9px 6px; border-bottom:1px solid var(--border); font-weight:700; white-space:nowrap; }
+.tbl th.num { text-align:right; }
+.tbl td { padding:10px 6px; border-bottom:1px solid var(--border-lt); vertical-align:middle; font-size:13px; }
+.tbl td.num { text-align:right; font-variant-numeric:tabular-nums; }
+.tbl tr:hover td { background:var(--surface-mid); }
 
-/* ── AUDIENCE ── */
-.aud-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+/* Bar (horizontal) */
+.h-bar-track { height:7px; background:var(--border); border-radius:4px; overflow:hidden; margin-top:3px; }
+.h-bar-fill { height:100%; border-radius:4px; }
 
-/* Horizontal bars */
-.hbar-list { display:flex; flex-direction:column; gap:9px; }
-.hbar-item { display:grid; grid-template-columns:1fr auto; gap:4px 8px; align-items:center; }
-.hbar-lbl { font-size:12.5px; color:var(--text); }
-.hbar-pct { font-size:12.5px; font-weight:700; color:var(--text-2); font-variant-numeric:tabular-nums; text-align:right; }
-.hbar-track { grid-column:1/-1; height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
-.hbar-fill { height:100%; border-radius:3px; transition:width .3s; }
-.hbar-fill.fb { background:var(--fb); }
-.hbar-fill.ig { background:var(--ig); }
+/* Age/gender bars */
+.age-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.age-lbl { font-size:11px; color:var(--text-3); width:38px; flex-shrink:0; text-align:right; }
+.age-bar-m { height:13px; border-radius:2px; background:var(--fb); min-width:2px; }
+.age-bar-f { height:13px; border-radius:2px; background:var(--ig); min-width:2px; }
+.age-val { font-size:10.5px; color:var(--text-3); min-width:34px; }
 
-/* Age/gender stacked bars */
-.agegender { display:flex; flex-direction:column; gap:7px; }
-.ag-row { display:grid; grid-template-columns:46px 1fr auto; gap:6px; align-items:center; }
-.ag-lbl { font-size:11.5px; color:var(--text-3); font-weight:600; }
-.ag-bars { display:flex; height:14px; border-radius:3px; overflow:hidden; gap:1px; }
-.ag-m { border-radius:3px 0 0 3px; }
-.ag-f { border-radius:0 3px 3px 0; }
-.ag-total { font-size:11px; color:var(--text-3); font-variant-numeric:tabular-nums; min-width:36px; text-align:right; }
-.ag-legend { display:flex; gap:12px; margin-bottom:10px; }
-.ag-legend .ag-leg { display:flex; align-items:center; gap:5px; font-size:11.5px; color:var(--text-3); }
-.ag-legend .ag-leg-dot { width:10px; height:10px; border-radius:2px; }
+/* Spike callout */
+.spike-callout { background:linear-gradient(135deg,#fff8e7,#fef0fb); border:1.5px solid #f5c200; border-radius:10px; padding:16px 20px; margin-bottom:20px; display:flex; gap:14px; align-items:flex-start; }
+.spike-callout .spike-icon { font-size:22px; flex-shrink:0; line-height:1; margin-top:2px; }
+.spike-callout .spike-body h4 { margin:0 0 6px; font-size:13.5px; font-weight:700; color:#8A5A00; }
+.spike-callout .spike-body p { margin:0; font-size:12.5px; color:#6B4200; line-height:1.6; }
+.spike-callout .spike-note { margin-top:8px; font-size:11.5px; color:#8A6206; font-style:italic; background:rgba(255,200,0,.12); padding:6px 10px; border-radius:6px; }
 
-/* Cities */
-.cities-list { display:flex; flex-direction:column; gap:6px; margin-top:12px; }
-.city-item { display:flex; justify-content:space-between; align-items:center; font-size:12.5px; padding:6px 0; border-bottom:1px solid var(--border-lt); }
-.city-item:last-child { border-bottom:none; }
-.city-name { color:var(--text); }
-.city-pct { font-weight:700; color:var(--text-2); font-variant-numeric:tabular-nums; }
+/* Delta colors in weekly table */
+.d-pos { color:var(--pos); font-weight:700; font-size:11px; }
+.d-neg { color:var(--neg); font-weight:700; font-size:11px; }
+.d-neu { color:var(--text-3); font-size:11px; }
 
-/* ── SECTION TITLES ── */
-.section-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text-3); margin:0 0 12px; }
-
-/* ── FOOTER ── */
-.footer { border-top:1px solid var(--border-lt); padding-top:16px; margin-top:8px; display:flex; justify-content:space-between; align-items:center; }
-.footer-txt { font-size:11.5px; color:var(--text-3); line-height:1.6; }
-.footer-txt b { color:var(--text-2); font-weight:600; }
-
-/* ── TABS ── */
-.tabs { display:flex; gap:0; border-bottom:1px solid var(--border); margin-bottom:20px; }
-.tab { padding:10px 16px; cursor:pointer; color:var(--text-3); font-weight:600; font-size:13px; border-bottom:2px solid transparent; user-select:none; transition:color .15s; }
-.tab:hover { color:var(--text-2); }
-.tab.active { color:var(--fb); border-bottom-color:var(--fb); }
+/* Tab content */
 .tab-content { display:none; }
 .tab-content.active { display:block; }
 
-/* Utility */
-.mt-0 { margin-top:0; }
-.mb-16 { margin-bottom:16px; }
-.mb-20 { margin-bottom:20px; }
+/* Legend dot */
+.legend-dot { display:inline-block; width:16px; height:3px; border-radius:2px; vertical-align:middle; }
+
+/* Toast */
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--text); color:#fff; padding:14px 20px; border-radius:10px; font-size:13px; box-shadow:0 4px 16px rgba(0,0,0,.2); opacity:0; transition:all .25s; pointer-events:none; max-width:520px; line-height:1.5; z-index:1000; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
+.toast.success { background:var(--pos); }
+
+@media print {
+  .topbar,.tabs,.period-bar { display:none !important; }
+  .tab-content { display:block !important; }
+  .app { padding:0 !important; }
+}
 </style>
-<style id="auth-veil">html{visibility:hidden}</style>
 <script>
+/* ---- Auth veil ---- */
 fetch('/api/auth/verify')
-  .then(r => { if (!r.ok) throw 0; return r.json(); })
+  .then(r => { if(!r.ok) throw 0; })
   .then(() => { document.getElementById('auth-veil').remove(); })
   .catch(() => location.replace('/login?next=' + encodeURIComponent(location.pathname)));
 </script>
 </head>
 <body>
-<div class="app" id="app">
+<div class="app">
 
-  <!-- ── TOPBAR ── -->
+  <!-- TOPBAR -->
   <div class="topbar">
     <div class="brand">
       <div class="brand-logo">OM</div>
       <div>
-        <h1>Optimedia</h1>
-        <div class="sub">Dashboard Social · 7 mag – 3 giu 2026</div>
-      </div>
-      <div class="platform-badges" style="margin-left:14px">
-        <span class="plat-badge fb">f Facebook</span>
-        <span class="plat-badge ig">&#x2665; Instagram</span>
+        <h1>Optimedia – Meta Dashboard</h1>
+        <div class="sub">Facebook &amp; Instagram &middot; Periodo 7 mag – 3 giu 2026</div>
       </div>
     </div>
-    <div class="topbar-right">
-      <div class="update">Aggiornato il <b>5 giu 2026</b></div>
-      <button class="logout-btn" id="logoutBtn">&#x23FB; Esci</button>
+    <div class="update">
+      <div>Ultimo aggiornamento</div>
+      <div><b id="lastUpdate">—</b></div>
+      <button class="logout-btn" id="logoutBtn">&#9211; Esci</button>
     </div>
   </div>
 
-  <!-- ── PERIOD BAR ── -->
-  <div class="period-bar">
-    <div class="period-tabs">
-      <div class="period-tab" data-period="7d">Ultima settimana</div>
-      <div class="period-tab active" data-period="all">Tutto il periodo</div>
-      <div class="period-tab" data-period="custom">Personalizzato</div>
-    </div>
-    <span class="period-range" id="periodLabel">7 mag – 3 giu 2026</span>
-    <div class="period-custom" id="customBar">
-      <label>Da <input type="date" id="dateFrom" value="2026-05-07" min="2026-05-07" max="2026-06-03"></label>
-      <label>A <input type="date" id="dateTo" value="2026-06-03" min="2026-05-07" max="2026-06-03"></label>
-      <button id="applyCustom">Applica</button>
-    </div>
-  </div>
-
-  <!-- ── SPIKE ALERT ── -->
-  <div class="spike-box mb-20" id="spikeBox">
-    <div class="spike-icon">&#x26A1;</div>
-    <div class="spike-body">
-      <div class="spike-title">Picco virale: 18–22 maggio 2026</div>
-      <div class="spike-detail">Spike organico rilevato. Probabile post virale che ha generato una reach anomala su entrambe le piattaforme nel periodo selezionato.</div>
-      <div class="spike-pills">
-        <span class="spike-pill">&#x1F4D8; FB +115k views</span>
-        <span class="spike-pill">&#x1F4F7; IG +86k reach</span>
-        <span class="spike-pill">&#x2197; Reach cumulativa: +201k</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── TABS ── -->
+  <!-- TABS -->
   <div class="tabs">
-    <div class="tab active" data-tab="overview">Overview</div>
+    <div class="tab active" data-tab="overview">Panoramica</div>
+    <div class="tab" data-tab="settimanale">Analisi Settimanale</div>
     <div class="tab" data-tab="audience">Audience</div>
   </div>
 
-  <!-- ═══════════════ TAB OVERVIEW ═══════════════ -->
+  <!-- PERIOD BAR -->
+  <div class="period-bar">
+    <div class="period-tabs" id="periodTabs">
+      <div class="period-tab" data-p="settimanale">Settimanale</div>
+      <div class="period-tab" data-p="mensile">Mensile</div>
+      <div class="period-tab active" data-p="storico">Storico</div>
+      <div class="period-tab" data-p="custom">Personalizzato</div>
+    </div>
+    <div class="period-range" id="periodRange">—</div>
+    <div class="period-custom" id="periodCustom">
+      <label style="font-size:12px;color:var(--text-2)">Da</label>
+      <input type="date" id="dateFrom">
+      <label style="font-size:12px;color:var(--text-2)">a</label>
+      <input type="date" id="dateTo">
+      <button class="btn" id="applyCustom">Applica</button>
+    </div>
+  </div>
+
+  <!-- TAB: PANORAMICA -->
   <div class="tab-content active" id="tab-overview">
 
-    <!-- KPI ROW CROSS-PLATFORM -->
-    <div class="kpi-row" id="kpiRowCross">
-      <div class="kpi">
-        <div class="label">Reach totale <span class="kpi-info">i<span class="kpi-tip">FB Viewers + IG Reach nel periodo selezionato</span></span></div>
-        <div class="value" id="xReach">—</div>
-        <div class="sub-val" id="xReachSub">—</div>
-      </div>
-      <div class="kpi">
-        <div class="label">Interazioni totali <span class="kpi-info">i<span class="kpi-tip">Somma interazioni FB + IG (like, commenti, condivisioni, reazioni)</span></span></div>
-        <div class="value" id="xInt">—</div>
-        <div class="sub-val" id="xIntSub">—</div>
-      </div>
-      <div class="kpi">
-        <div class="label">ER medio pesato <span class="kpi-info">i<span class="kpi-tip">Engagement Rate medio ponderato per reach. Formula: Interazioni totali / Reach totale × 100</span></span></div>
-        <div class="value" id="xER">—</div>
-        <div class="sub-val" id="xERSub">—</div>
-      </div>
-      <div class="kpi">
-        <div class="label">Nuovi follower / follow <span class="kpi-info">i<span class="kpi-tip">IG: nuovi follower nel periodo · FB: follow alla pagina nel periodo</span></span></div>
-        <div class="value" id="xFollow">—</div>
-        <div class="sub-val" id="xFollowSub">—</div>
+    <!-- Spike callout -->
+    <div class="spike-callout" id="spikeCallout" style="display:none">
+      <div class="spike-icon">&#9889;</div>
+      <div class="spike-body">
+        <h4>Spike 18–22 mag &mdash; Contenuto organico virale</h4>
+        <p>
+          <strong>Facebook:</strong> +114k views &nbsp;&middot;&nbsp;
+          <strong>Instagram:</strong> +84k reach &nbsp;&middot;&nbsp;
+          <strong>Interazioni totali picco:</strong> +420
+        </p>
+        <div class="spike-note">Probabilmente un post organico virale. Consulta Meta Business Suite per identificare il contenuto specifico che ha generato lo spike.</div>
       </div>
     </div>
 
-    <!-- PLATFORM COLUMNS -->
-    <div class="row-2 mb-20">
+    <!-- KPI cross-platform -->
+    <div class="kpi-row-4" id="kpiCross"></div>
 
-      <!-- FACEBOOK -->
-      <div class="card">
-        <div class="plat-header">
-          <div class="plat-icon fb">f</div>
-          <div>
-            <div class="plat-title">Facebook</div>
-            <div class="plat-sub">Pagina Optimedia</div>
-          </div>
-        </div>
-        <div class="plat-kpi-grid" id="fbKpiGrid">
-          <div class="pk">
-            <div class="pk-lbl">Visualizzazioni</div>
-            <div class="pk-val fb-color" id="fbViews">—</div>
-            <div class="pk-sub">totale periodo</div>
-          </div>
-          <div class="pk">
-            <div class="pk-lbl">Viewers unici</div>
-            <div class="pk-val" id="fbViewers">—</div>
-            <div class="pk-sub">reach organica</div>
-          </div>
-          <div class="pk">
-            <div class="pk-lbl">Interazioni</div>
-            <div class="pk-val" id="fbInt">—</div>
-            <div class="pk-sub">reazioni + commenti</div>
-          </div>
-          <div class="pk">
-            <div class="pk-lbl">ER</div>
-            <div class="pk-val fb-color" id="fbER">—</div>
-            <div class="pk-sub">engagement rate</div>
-          </div>
-          <div class="pk">
-            <div class="pk-lbl">Visite pagina</div>
-            <div class="pk-val" id="fbVisits">—</div>
-            <div class="pk-sub">accessi profilo</div>
-          </div>
-          <div class="pk">
-            <div class="pk-lbl">Follow</div>
-            <div class="pk-val" id="fbFollows">—</div>
-            <div class="pk-sub">nuovi nel periodo</div>
-          </div>
-        </div>
+    <!-- Trend chart -->
+    <div class="card" style="margin-bottom:20px">
+      <h3>Trend giornaliero <span class="hint">FB Views &middot; IG Reach &middot; Interazioni totali</span></h3>
+      <div id="chartWrap" style="position:relative;height:340px">
+        <canvas id="chartTrend" class="trend-canvas" style="height:340px"></canvas>
       </div>
-
-      <!-- INSTAGRAM -->
-      <div class="card">
-        <div class="plat-header">
-          <div class="plat-icon ig">&#x2665;</div>
-          <div>
-            <div class="plat-title">Instagram</div>
-            <div class="plat-sub" id="igFollowersSub">707 follower totali</div>
-          </div>
-        </div>
-        <div class="plat-kpi-grid" id="igKpiGrid">
-          <div class="pk">
-            <div class="pk-lbl">Visualizzazioni</div>
-            <div class="pk-val ig-color" id="igViews">—</div>
-            <div class="pk-sub">totale periodo</div>
-          </div>
-          <div class="pk">
-            <div class="pk-lbl">Reach unica</div>
-            <div class="pk-val" id="igReach">—</div>
-            <div class="pk-sub">account raggiunti</div>
-          </div>
-          <div class="pk">
-            <div class="pk-lbl">Interazioni</div>
-            <div class="pk-val" id="igInt">—</div>
-            <div class="pk-sub">like + commenti</div>
-          </div>
-          <div class="pk">
-            <div class="pk-lbl">ER</div>
-            <div class="pk-val ig-color" id="igER">—</div>
-            <div class="pk-sub">engagement rate</div>
-          </div>
-          <div class="pk">
-            <div class="pk-lbl">Visite profilo</div>
-            <div class="pk-val" id="igVisits">—</div>
-            <div class="pk-sub">accessi profilo</div>
-          </div>
-          <div class="pk">
-            <div class="pk-lbl">Nuovi follower</div>
-            <div class="pk-val ig-color" id="igFollows">—</div>
-            <div class="pk-sub">nel periodo</div>
-          </div>
-        </div>
+      <div style="display:flex;gap:20px;margin-top:12px;flex-wrap:wrap;font-size:11.5px;color:var(--text-3)">
+        <span><span class="legend-dot" style="background:var(--fb)"></span>&nbsp;FB Views (scala dx)</span>
+        <span><span class="legend-dot" style="background:var(--ig)"></span>&nbsp;IG Reach (scala dx)</span>
+        <span><span style="display:inline-block;width:16px;border-top:2px dashed var(--meta);vertical-align:middle"></span>&nbsp;Interazioni (scala sx)</span>
+        <span style="margin-left:auto;color:#8A6206">&#9889; = spike virale 18–22 mag</span>
       </div>
     </div>
 
-    <!-- TREND CHART -->
-    <div class="card mb-20">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
-        <h3 style="margin:0">Trend giornaliero</h3>
+    <!-- Platform KPIs (2 columns) -->
+    <div class="platform-grid">
+      <!-- Facebook -->
+      <div class="platform-col">
+        <div class="platform-header fb">
+          <div class="platform-icon fb">f</div>
+          <div class="platform-title fb">Facebook</div>
+        </div>
+        <div class="platform-kpi-grid" id="fbKpis"></div>
       </div>
-      <div class="chart-legend" id="chartLegend">
-        <div class="leg"><div class="leg-dot" style="background:#1877F2"></div>FB Views</div>
-        <div class="leg"><div class="leg-dot" style="background:#E1306C"></div>IG Reach</div>
-        <div class="leg"><div class="leg-dot" style="background:#6B46C1"></div>Interazioni totali</div>
-      </div>
-      <div class="chart-wrap" id="chartWrap" style="height:300px">
-        <canvas id="trendCanvas"></canvas>
+      <!-- Instagram -->
+      <div class="platform-col">
+        <div class="platform-header ig">
+          <div class="platform-icon ig">ig</div>
+          <div class="platform-title ig">Instagram</div>
+        </div>
+        <div class="platform-kpi-grid" id="igKpis"></div>
       </div>
     </div>
 
   </div><!-- /tab-overview -->
 
-  <!-- ═══════════════ TAB AUDIENCE ═══════════════ -->
-  <div class="tab-content" id="tab-audience">
-
-    <div class="aud-row">
-
-      <!-- FACEBOOK AUDIENCE -->
-      <div class="card">
-        <div class="plat-header">
-          <div class="plat-icon fb">f</div>
-          <div>
-            <div class="plat-title">Facebook – Audience</div>
-            <div class="plat-sub">Distribuzione followers pagina</div>
-          </div>
-        </div>
-
-        <p class="section-title mt-0">Top paesi</p>
-        <div class="hbar-list">
-          <div class="hbar-item"><span class="hbar-lbl">Romania</span><span class="hbar-pct">76,2%</span><div class="hbar-track"><div class="hbar-fill fb" style="width:76.2%"></div></div></div>
-          <div class="hbar-item"><span class="hbar-lbl">Italia</span><span class="hbar-pct">7,1%</span><div class="hbar-track"><div class="hbar-fill fb" style="width:7.1%"></div></div></div>
-          <div class="hbar-item"><span class="hbar-lbl">Francia</span><span class="hbar-pct">2,5%</span><div class="hbar-track"><div class="hbar-fill fb" style="width:2.5%"></div></div></div>
-          <div class="hbar-item"><span class="hbar-lbl">Belgio</span><span class="hbar-pct">2,2%</span><div class="hbar-track"><div class="hbar-fill fb" style="width:2.2%"></div></div></div>
-          <div class="hbar-item"><span class="hbar-lbl">Stati Uniti</span><span class="hbar-pct">2,1%</span><div class="hbar-track"><div class="hbar-fill fb" style="width:2.1%"></div></div></div>
-        </div>
-
-        <p class="section-title" style="margin-top:18px">Età e genere</p>
-        <div class="ag-legend">
-          <div class="ag-leg"><div class="ag-leg-dot" style="background:var(--fb)"></div>Uomini</div>
-          <div class="ag-leg"><div class="ag-leg-dot" style="background:#F77737"></div>Donne</div>
-        </div>
-        <div class="agegender" id="fbAgeGender"></div>
-
-        <p class="section-title" style="margin-top:18px">Top citt&#xe0;</p>
-        <div class="cities-list">
-          <div class="city-item"><span class="city-name">Oradea, Romania</span><span class="city-pct">47,5%</span></div>
-          <div class="city-item"><span class="city-name">Bucharest, Romania</span><span class="city-pct">1,7%</span></div>
-          <div class="city-item"><span class="city-name">Cluj-Napoca, Romania</span><span class="city-pct">1,2%</span></div>
-        </div>
-      </div>
-
-      <!-- INSTAGRAM AUDIENCE -->
-      <div class="card">
-        <div class="plat-header">
-          <div class="plat-icon ig">&#x2665;</div>
-          <div>
-            <div class="plat-title">Instagram – Audience</div>
-            <div class="plat-sub">707 follower totali</div>
-          </div>
-        </div>
-
-        <p class="section-title mt-0">Top paesi</p>
-        <div class="hbar-list">
-          <div class="hbar-item"><span class="hbar-lbl">Romania</span><span class="hbar-pct">38,2%</span><div class="hbar-track"><div class="hbar-fill ig" style="width:38.2%"></div></div></div>
-          <div class="hbar-item"><span class="hbar-lbl">Italia</span><span class="hbar-pct">20,7%</span><div class="hbar-track"><div class="hbar-fill ig" style="width:20.7%"></div></div></div>
-          <div class="hbar-item"><span class="hbar-lbl">Francia</span><span class="hbar-pct">12,7%</span><div class="hbar-track"><div class="hbar-fill ig" style="width:12.7%"></div></div></div>
-          <div class="hbar-item"><span class="hbar-lbl">Stati Uniti</span><span class="hbar-pct">7,8%</span><div class="hbar-track"><div class="hbar-fill ig" style="width:7.8%"></div></div></div>
-          <div class="hbar-item"><span class="hbar-lbl">Austria</span><span class="hbar-pct">2,0%</span><div class="hbar-track"><div class="hbar-fill ig" style="width:2.0%"></div></div></div>
-        </div>
-
-        <p class="section-title" style="margin-top:18px">Et&#xe0; e genere</p>
-        <div class="ag-legend">
-          <div class="ag-leg"><div class="ag-leg-dot" style="background:var(--ig)"></div>Uomini</div>
-          <div class="ag-leg"><div class="ag-leg-dot" style="background:#F77737"></div>Donne</div>
-        </div>
-        <div class="agegender" id="igAgeGender"></div>
-
-        <p class="section-title" style="margin-top:18px">Top citt&#xe0;</p>
-        <div class="cities-list">
-          <div class="city-item"><span class="city-name">Oradea, Romania</span><span class="city-pct">19,0%</span></div>
-          <div class="city-item"><span class="city-name">S&#xe2;ntandrei, Romania</span><span class="city-pct">2,0%</span></div>
-          <div class="city-item"><span class="city-name">Cluj-Napoca, Romania</span><span class="city-pct">1,6%</span></div>
-          <div class="city-item"><span class="city-name">Bucharest, Romania</span><span class="city-pct">1,6%</span></div>
-        </div>
-      </div>
-
+  <!-- TAB: ANALISI SETTIMANALE -->
+  <div class="tab-content" id="tab-settimanale">
+    <div class="card">
+      <h3>Riepilogo settimanale <span class="hint">raggruppato per settimana ISO &middot; &Delta; vs settimana precedente</span></h3>
+      <table class="tbl">
+        <thead><tr>
+          <th>Settimana</th>
+          <th class="num" style="color:var(--fb)">FB Views</th>
+          <th class="num" style="color:var(--ig)">IG Reach</th>
+          <th class="num">Interazioni tot.</th>
+          <th class="num">ER medio %</th>
+          <th class="num">&Delta; Interazioni</th>
+        </tr></thead>
+        <tbody id="weeklyBody"></tbody>
+      </table>
     </div>
-
-  </div><!-- /tab-audience -->
-
-  <!-- ── FOOTER ── -->
-  <div class="footer">
-    <div class="footer-txt">
-      <b>Periodo:</b> 7 mag – 3 giu 2026 &nbsp;·&nbsp; <b>Aggiornato:</b> 5 giu 2026 &nbsp;·&nbsp; Dati: Meta Business Suite
-    </div>
-    <div class="footer-txt" style="text-align:right">Optimedia Dashboard · Fannel Design</div>
   </div>
 
+  <!-- TAB: AUDIENCE -->
+  <div class="tab-content" id="tab-audience">
+    <div class="row-2">
+      <div class="card">
+        <h3>Top Paesi <span class="hint">audience Facebook vs Instagram</span></h3>
+        <div id="audienceCountries"></div>
+      </div>
+      <div class="card">
+        <h3>Top Citt&agrave; <span class="hint">FB + IG</span></h3>
+        <div id="audienceCities"></div>
+      </div>
+    </div>
+    <div class="row-2">
+      <div class="card">
+        <h3>Et&agrave; / Genere &mdash; <span style="color:var(--fb)">Facebook</span></h3>
+        <div style="display:flex;gap:16px;margin-bottom:12px;font-size:11.5px">
+          <span><span style="display:inline-block;width:10px;height:10px;background:var(--fb);border-radius:2px;vertical-align:middle"></span>&nbsp;Uomini</span>
+          <span><span style="display:inline-block;width:10px;height:10px;background:var(--ig);border-radius:2px;vertical-align:middle"></span>&nbsp;Donne</span>
+        </div>
+        <div id="fbAgeGender"></div>
+      </div>
+      <div class="card">
+        <h3>Et&agrave; / Genere &mdash; <span style="color:var(--ig)">Instagram</span></h3>
+        <div style="display:flex;gap:16px;margin-bottom:12px;font-size:11.5px">
+          <span><span style="display:inline-block;width:10px;height:10px;background:var(--fb);border-radius:2px;vertical-align:middle"></span>&nbsp;Uomini</span>
+          <span><span style="display:inline-block;width:10px;height:10px;background:var(--ig);border-radius:2px;vertical-align:middle"></span>&nbsp;Donne</span>
+        </div>
+        <div id="igAgeGender"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Follower Instagram <span class="hint">snapshot totale</span></h3>
+      <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap">
+        <div>
+          <div style="font-size:11px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Follower totali</div>
+          <div style="font-size:36px;font-weight:800;color:var(--ig);letter-spacing:-.8px">707</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Nuovi nel periodo</div>
+          <div style="font-size:36px;font-weight:800;color:var(--pos);letter-spacing:-.8px" id="igNewFollowers">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
 </div><!-- /app -->
 
-<!-- TOOLTIP -->
-<div class="chart-tooltip" id="chartTooltip" style="display:none"></div>
-
 <script>
-/* ═══════════════════════════════════════════════════════
-   DATA
-═══════════════════════════════════════════════════════ */
+/* ============================================================
+   DATI
+   ============================================================ */
 const OPTIMEDIA_DATA = {
-  "meta":{"cliente":"Optimedia","data_min":"2026-05-07","data_max":"2026-06-03","aggiornato":"2026-06-05"},
-  "facebook":{
-    "kpi":{"views":123588,"viewers":109031,"interactions":353,"follows":7,"link_clicks":0,"visits":834,"er":0.29},
-    "metriche":[
-      {"data":"2026-05-07","views":203,"viewers":99,"interactions":7,"follows":0,"link_clicks":0,"visits":26},
-      {"data":"2026-05-08","views":139,"viewers":52,"interactions":4,"follows":0,"link_clicks":0,"visits":12},
-      {"data":"2026-05-09","views":86,"viewers":32,"interactions":1,"follows":0,"link_clicks":0,"visits":18},
-      {"data":"2026-05-10","views":61,"viewers":31,"interactions":0,"follows":0,"link_clicks":0,"visits":13},
-      {"data":"2026-05-11","views":710,"viewers":337,"interactions":33,"follows":1,"link_clicks":0,"visits":32},
-      {"data":"2026-05-12","views":549,"viewers":283,"interactions":20,"follows":0,"link_clicks":0,"visits":31},
-      {"data":"2026-05-13","views":192,"viewers":122,"interactions":5,"follows":0,"link_clicks":0,"visits":20},
-      {"data":"2026-05-14","views":92,"viewers":58,"interactions":1,"follows":0,"link_clicks":0,"visits":20},
-      {"data":"2026-05-15","views":933,"viewers":451,"interactions":31,"follows":0,"link_clicks":0,"visits":37},
-      {"data":"2026-05-16","views":608,"viewers":355,"interactions":4,"follows":0,"link_clicks":0,"visits":25},
-      {"data":"2026-05-17","views":236,"viewers":118,"interactions":10,"follows":0,"link_clicks":0,"visits":24},
-      {"data":"2026-05-18","views":30427,"viewers":27612,"interactions":27,"follows":2,"link_clicks":0,"visits":107},
-      {"data":"2026-05-19","views":32349,"viewers":29903,"interactions":34,"follows":0,"link_clicks":0,"visits":57},
-      {"data":"2026-05-20","views":13947,"viewers":12535,"interactions":5,"follows":0,"link_clicks":0,"visits":33},
-      {"data":"2026-05-21","views":21043,"viewers":19334,"interactions":1,"follows":0,"link_clicks":0,"visits":15},
-      {"data":"2026-05-22","views":17172,"viewers":16075,"interactions":49,"follows":0,"link_clicks":0,"visits":18},
-      {"data":"2026-05-23","views":378,"viewers":219,"interactions":8,"follows":0,"link_clicks":0,"visits":18},
-      {"data":"2026-05-24","views":231,"viewers":90,"interactions":4,"follows":0,"link_clicks":0,"visits":22},
-      {"data":"2026-05-25","views":258,"viewers":70,"interactions":1,"follows":0,"link_clicks":0,"visits":39},
-      {"data":"2026-05-26","views":587,"viewers":380,"interactions":35,"follows":0,"link_clicks":0,"visits":64},
-      {"data":"2026-05-27","views":234,"viewers":171,"interactions":9,"follows":1,"link_clicks":0,"visits":22},
-      {"data":"2026-05-28","views":108,"viewers":53,"interactions":1,"follows":0,"link_clicks":0,"visits":20},
-      {"data":"2026-05-29","views":125,"viewers":42,"interactions":1,"follows":1,"link_clicks":0,"visits":29},
-      {"data":"2026-05-30","views":70,"viewers":18,"interactions":0,"follows":1,"link_clicks":0,"visits":16},
-      {"data":"2026-05-31","views":58,"viewers":32,"interactions":0,"follows":0,"link_clicks":0,"visits":17},
-      {"data":"2026-06-01","views":37,"viewers":21,"interactions":2,"follows":0,"link_clicks":0,"visits":26},
-      {"data":"2026-06-02","views":141,"viewers":23,"interactions":0,"follows":1,"link_clicks":0,"visits":14},
-      {"data":"2026-06-03","views":2614,"viewers":515,"interactions":60,"follows":0,"link_clicks":0,"visits":59}
+  meta: { cliente:'Optimedia', data_min:'2026-05-07', data_max:'2026-06-03', aggiornato:'2026-06-05' },
+  facebook: {
+    kpi: { views:123588, viewers:109031, interactions:353, follows:7, link_clicks:0, visits:834, er:0.29 },
+    metriche: [
+      {data:'2026-05-07',views:203,viewers:99,interactions:7,follows:0,visits:26},
+      {data:'2026-05-08',views:139,viewers:52,interactions:4,follows:0,visits:12},
+      {data:'2026-05-09',views:86,viewers:32,interactions:1,follows:0,visits:18},
+      {data:'2026-05-10',views:61,viewers:31,interactions:0,follows:0,visits:13},
+      {data:'2026-05-11',views:710,viewers:337,interactions:33,follows:1,visits:32},
+      {data:'2026-05-12',views:549,viewers:283,interactions:20,follows:0,visits:31},
+      {data:'2026-05-13',views:192,viewers:122,interactions:5,follows:0,visits:20},
+      {data:'2026-05-14',views:92,viewers:58,interactions:1,follows:0,visits:20},
+      {data:'2026-05-15',views:933,viewers:451,interactions:31,follows:0,visits:37},
+      {data:'2026-05-16',views:608,viewers:355,interactions:4,follows:0,visits:25},
+      {data:'2026-05-17',views:236,viewers:118,interactions:10,follows:0,visits:24},
+      {data:'2026-05-18',views:30427,viewers:27612,interactions:27,follows:2,visits:107},
+      {data:'2026-05-19',views:32349,viewers:29903,interactions:34,follows:0,visits:57},
+      {data:'2026-05-20',views:13947,viewers:12535,interactions:5,follows:0,visits:33},
+      {data:'2026-05-21',views:21043,viewers:19334,interactions:1,follows:0,visits:15},
+      {data:'2026-05-22',views:17172,viewers:16075,interactions:49,follows:0,visits:18},
+      {data:'2026-05-23',views:378,viewers:219,interactions:8,follows:0,visits:18},
+      {data:'2026-05-24',views:231,viewers:90,interactions:4,follows:0,visits:22},
+      {data:'2026-05-25',views:258,viewers:70,interactions:1,follows:0,visits:39},
+      {data:'2026-05-26',views:587,viewers:380,interactions:35,follows:0,visits:64},
+      {data:'2026-05-27',views:234,viewers:171,interactions:9,follows:1,visits:22},
+      {data:'2026-05-28',views:108,viewers:53,interactions:1,follows:0,visits:20},
+      {data:'2026-05-29',views:125,viewers:42,interactions:1,follows:1,visits:29},
+      {data:'2026-05-30',views:70,viewers:18,interactions:0,follows:1,visits:16},
+      {data:'2026-05-31',views:58,viewers:32,interactions:0,follows:0,visits:17},
+      {data:'2026-06-01',views:37,viewers:21,interactions:2,follows:0,visits:26},
+      {data:'2026-06-02',views:141,viewers:23,interactions:0,follows:1,visits:14},
+      {data:'2026-06-03',views:2614,viewers:515,interactions:60,follows:0,visits:59}
     ],
-    "audience":{
-      "top_countries":[{"paese":"Romania","pct":76.2},{"paese":"Italy","pct":7.1},{"paese":"France","pct":2.5},{"paese":"Belgium","pct":2.2},{"paese":"United States","pct":2.1}],
-      "age_gender":[
-        {"fascia":"18-24","uomini":1.7,"donne":1.0},{"fascia":"25-34","uomini":12.8,"donne":12.0},
-        {"fascia":"35-44","uomini":19.7,"donne":18.5},{"fascia":"45-54","uomini":11.3,"donne":11.6},
-        {"fascia":"55-64","uomini":3.8,"donne":4.4},{"fascia":"65+","uomini":1.7,"donne":1.5}
+    audience: {
+      top_countries:[{paese:'Romania',pct:76.2},{paese:'Italy',pct:7.1},{paese:'France',pct:2.5},{paese:'Belgium',pct:2.2},{paese:'United States',pct:2.1}],
+      age_gender:[
+        {fascia:'18-24',uomini:1.7,donne:1.0},{fascia:'25-34',uomini:12.8,donne:12.0},
+        {fascia:'35-44',uomini:19.7,donne:18.5},{fascia:'45-54',uomini:11.3,donne:11.6},
+        {fascia:'55-64',uomini:3.8,donne:4.4},{fascia:'65+',uomini:1.7,donne:1.5}
       ],
-      "top_cities":[{"citta":"Oradea, Romania","pct":47.5},{"citta":"Bucharest, Romania","pct":1.7},{"citta":"Cluj-Napoca, Romania","pct":1.2}]
+      top_cities:[{citta:'Oradea, Romania',pct:47.5},{citta:'Bucharest, Romania',pct:1.7},{citta:'Cluj-Napoca, Romania',pct:1.2}]
     }
   },
-  "instagram":{
-    "kpi":{"followers":707,"nuovi_followers":30,"views":97295,"reach":86210,"interactions":619,"visits":294,"link_clicks":1,"er":0.72},
-    "metriche":[
-      {"data":"2026-05-07","views":73,"reach":18,"interactions":1,"follows":0,"link_clicks":0,"visits":4},
-      {"data":"2026-05-08","views":40,"reach":10,"interactions":0,"follows":0,"link_clicks":0,"visits":2},
-      {"data":"2026-05-09","views":20,"reach":8,"interactions":0,"follows":0,"link_clicks":0,"visits":1},
-      {"data":"2026-05-10","views":25,"reach":11,"interactions":3,"follows":0,"link_clicks":0,"visits":1},
-      {"data":"2026-05-11","views":722,"reach":357,"interactions":41,"follows":0,"link_clicks":0,"visits":12},
-      {"data":"2026-05-12","views":173,"reach":93,"interactions":5,"follows":0,"link_clicks":0,"visits":7},
-      {"data":"2026-05-13","views":168,"reach":20,"interactions":5,"follows":0,"link_clicks":0,"visits":7},
-      {"data":"2026-05-14","views":35,"reach":14,"interactions":0,"follows":0,"link_clicks":0,"visits":3},
-      {"data":"2026-05-15","views":311,"reach":150,"interactions":15,"follows":0,"link_clicks":0,"visits":5},
-      {"data":"2026-05-16","views":86,"reach":51,"interactions":4,"follows":0,"link_clicks":0,"visits":2},
-      {"data":"2026-05-17","views":35,"reach":15,"interactions":0,"follows":0,"link_clicks":0,"visits":0},
-      {"data":"2026-05-18","views":2663,"reach":2414,"interactions":16,"follows":2,"link_clicks":0,"visits":11},
-      {"data":"2026-05-19","views":33642,"reach":30231,"interactions":180,"follows":9,"link_clicks":0,"visits":54},
-      {"data":"2026-05-20","views":14601,"reach":13936,"interactions":56,"follows":3,"link_clicks":1,"visits":27},
-      {"data":"2026-05-21","views":22898,"reach":20602,"interactions":77,"follows":3,"link_clicks":0,"visits":34},
-      {"data":"2026-05-22","views":18324,"reach":16999,"interactions":94,"follows":6,"link_clicks":0,"visits":18},
-      {"data":"2026-05-23","views":176,"reach":104,"interactions":8,"follows":1,"link_clicks":0,"visits":5},
-      {"data":"2026-05-24","views":64,"reach":22,"interactions":2,"follows":0,"link_clicks":0,"visits":1},
-      {"data":"2026-05-25","views":262,"reach":39,"interactions":4,"follows":1,"link_clicks":0,"visits":9},
-      {"data":"2026-05-26","views":1157,"reach":386,"interactions":47,"follows":3,"link_clicks":0,"visits":37},
-      {"data":"2026-05-27","views":295,"reach":80,"interactions":5,"follows":0,"link_clicks":0,"visits":13},
-      {"data":"2026-05-28","views":45,"reach":16,"interactions":2,"follows":2,"link_clicks":0,"visits":6},
-      {"data":"2026-05-29","views":33,"reach":12,"interactions":0,"follows":0,"link_clicks":0,"visits":4},
-      {"data":"2026-05-30","views":22,"reach":8,"interactions":0,"follows":0,"link_clicks":0,"visits":2},
-      {"data":"2026-05-31","views":148,"reach":11,"interactions":0,"follows":0,"link_clicks":0,"visits":8},
-      {"data":"2026-06-01","views":22,"reach":4,"interactions":0,"follows":0,"link_clicks":0,"visits":1},
-      {"data":"2026-06-02","views":55,"reach":10,"interactions":0,"follows":0,"link_clicks":0,"visits":7},
-      {"data":"2026-06-03","views":1200,"reach":589,"interactions":54,"follows":0,"link_clicks":0,"visits":13}
+  instagram: {
+    kpi: { followers:707, nuovi_followers:30, views:97295, reach:86210, interactions:619, visits:294, link_clicks:1, er:0.72 },
+    metriche: [
+      {data:'2026-05-07',views:73,reach:18,interactions:1,follows:0,visits:4},
+      {data:'2026-05-08',views:40,reach:10,interactions:0,follows:0,visits:2},
+      {data:'2026-05-09',views:20,reach:8,interactions:0,follows:0,visits:1},
+      {data:'2026-05-10',views:25,reach:11,interactions:3,follows:0,visits:1},
+      {data:'2026-05-11',views:722,reach:357,interactions:41,follows:0,visits:12},
+      {data:'2026-05-12',views:173,reach:93,interactions:5,follows:0,visits:7},
+      {data:'2026-05-13',views:168,reach:20,interactions:5,follows:0,visits:7},
+      {data:'2026-05-14',views:35,reach:14,interactions:0,follows:0,visits:3},
+      {data:'2026-05-15',views:311,reach:150,interactions:15,follows:0,visits:5},
+      {data:'2026-05-16',views:86,reach:51,interactions:4,follows:0,visits:2},
+      {data:'2026-05-17',views:35,reach:15,interactions:0,follows:0,visits:0},
+      {data:'2026-05-18',views:2663,reach:2414,interactions:16,follows:2,visits:11},
+      {data:'2026-05-19',views:33642,reach:30231,interactions:180,follows:9,visits:54},
+      {data:'2026-05-20',views:14601,reach:13936,interactions:56,follows:3,visits:27},
+      {data:'2026-05-21',views:22898,reach:20602,interactions:77,follows:3,visits:34},
+      {data:'2026-05-22',views:18324,reach:16999,interactions:94,follows:6,visits:18},
+      {data:'2026-05-23',views:176,reach:104,interactions:8,follows:1,visits:5},
+      {data:'2026-05-24',views:64,reach:22,interactions:2,follows:0,visits:1},
+      {data:'2026-05-25',views:262,reach:39,interactions:4,follows:1,visits:9},
+      {data:'2026-05-26',views:1157,reach:386,interactions:47,follows:3,visits:37},
+      {data:'2026-05-27',views:295,reach:80,interactions:5,follows:0,visits:13},
+      {data:'2026-05-28',views:45,reach:16,interactions:2,follows:2,visits:6},
+      {data:'2026-05-29',views:33,reach:12,interactions:0,follows:0,visits:4},
+      {data:'2026-05-30',views:22,reach:8,interactions:0,follows:0,visits:2},
+      {data:'2026-05-31',views:148,reach:11,interactions:0,follows:0,visits:8},
+      {data:'2026-06-01',views:22,reach:4,interactions:0,follows:0,visits:1},
+      {data:'2026-06-02',views:55,reach:10,interactions:0,follows:0,visits:7},
+      {data:'2026-06-03',views:1200,reach:589,interactions:54,follows:0,visits:13}
     ],
-    "audience":{
-      "followers_totali":707,
-      "top_countries":[{"paese":"Romania","pct":38.2},{"paese":"Italy","pct":20.7},{"paese":"France","pct":12.7},{"paese":"United States","pct":7.8},{"paese":"Austria","pct":2.0}],
-      "age_gender":[
-        {"fascia":"18-24","uomini":3.0,"donne":1.6},{"fascia":"25-34","uomini":20.9,"donne":10.7},
-        {"fascia":"35-44","uomini":22.5,"donne":13.9},{"fascia":"45-54","uomini":13.8,"donne":3.4},
-        {"fascia":"55-64","uomini":5.2,"donne":2.1},{"fascia":"65+","uomini":2.0,"donne":0.9}
+    audience: {
+      followers_totali:707,
+      top_countries:[{paese:'Romania',pct:38.2},{paese:'Italy',pct:20.7},{paese:'France',pct:12.7},{paese:'United States',pct:7.8},{paese:'Austria',pct:2.0}],
+      age_gender:[
+        {fascia:'18-24',uomini:3.0,donne:1.6},{fascia:'25-34',uomini:20.9,donne:10.7},
+        {fascia:'35-44',uomini:22.5,donne:13.9},{fascia:'45-54',uomini:13.8,donne:3.4},
+        {fascia:'55-64',uomini:5.2,donne:2.1},{fascia:'65+',uomini:2.0,donne:0.9}
       ],
-      "top_cities":[{"citta":"Oradea, Romania","pct":19.0},{"citta":"Sântandrei, Romania","pct":2.0},{"citta":"Cluj-Napoca, Romania","pct":1.6},{"citta":"Bucharest, Romania","pct":1.6}]
+      top_cities:[{citta:'Oradea, Romania',pct:19.0},{citta:'Santandrei, Romania',pct:2.0},{citta:'Cluj-Napoca, Romania',pct:1.6},{citta:'Bucharest, Romania',pct:1.6}]
     }
   }
 };
 
-/* ═══════════════════════════════════════════════════════
-   UTILS
-═══════════════════════════════════════════════════════ */
-function fmt(n) {
-  if (n >= 1e6) return (n/1e6).toFixed(1).replace('.0','') + 'M';
-  if (n >= 1e3) return (n/1e3).toFixed(1).replace('.0','') + 'k';
-  return n.toLocaleString('it-IT');
-}
-function fmtDate(iso) {
-  const [y,m,d] = iso.split('-');
-  const months = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
-  return `${parseInt(d)} ${months[parseInt(m)-1]}`;
-}
-function clamp(v,mn,mx){ return Math.min(mx,Math.max(mn,v)); }
+/* ============================================================
+   FORMATTERS
+   ============================================================ */
+const nfInt = new Intl.NumberFormat('it-IT', { maximumFractionDigits:0 });
+const nfDec = new Intl.NumberFormat('it-IT', { minimumFractionDigits:2, maximumFractionDigits:2 });
+const fmt    = n => (n == null || isNaN(n)) ? '—' : nfInt.format(n);
+const fmtPct = n => (n == null || isNaN(n)) ? '—' : nfDec.format(n) + '%';
+function fmtDate(iso){ if(!iso) return '—'; const [y,m,d]=iso.split('-'); return d+'/'+m+'/'+y; }
+function parseISO(iso){ const [y,m,d]=iso.split('-').map(Number); return new Date(y,m-1,d); }
+function toISO(d){ return d.toISOString().slice(0,10); }
+function inRange(iso, r){ return iso >= r.from && iso <= r.to; }
 
-/* ═══════════════════════════════════════════════════════
-   FILTER STATE
-═══════════════════════════════════════════════════════ */
-let activePeriod = 'all';
-let customFrom = '2026-05-07';
-let customTo   = '2026-06-03';
-const DATA_MIN = '2026-05-07';
-const DATA_MAX = '2026-06-03';
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = { tab:'overview', period:'storico', customFrom:null, customTo:null };
 
-function getDateRange() {
-  if (activePeriod === 'all') return { from: DATA_MIN, to: DATA_MAX };
-  if (activePeriod === '7d') {
-    // last 7 days in dataset
-    const all = OPTIMEDIA_DATA.facebook.metriche.map(r=>r.data).sort();
-    const to = all[all.length-1];
-    const from = all[Math.max(0, all.length-7)];
-    return { from, to };
+/* ============================================================
+   RANGE HELPERS  (same pattern as dashboard.html)
+   ============================================================ */
+function getRange(){
+  const allDates = [
+    ...OPTIMEDIA_DATA.facebook.metriche.map(m=>m.data),
+    ...OPTIMEDIA_DATA.instagram.metriche.map(m=>m.data)
+  ].sort();
+  const min = allDates[0], max = allDates[allDates.length-1];
+  if(state.period === 'settimanale'){
+    const end = parseISO(max);
+    const start = new Date(end); start.setDate(end.getDate()-6);
+    return { from: toISO(start > parseISO(min) ? start : parseISO(min)), to: max };
   }
-  return { from: customFrom, to: customTo };
+  if(state.period === 'mensile'){
+    const end = parseISO(max);
+    const start = new Date(end); start.setDate(end.getDate()-27);
+    return { from: toISO(start > parseISO(min) ? start : parseISO(min)), to: max };
+  }
+  if(state.period === 'custom'){
+    return { from: state.customFrom || min, to: state.customTo || max };
+  }
+  return { from: min, to: max };
 }
 
-function filterMetriche(metriche, from, to) {
-  return metriche.filter(r => r.data >= from && r.data <= to);
+function getPrevRange(r){
+  const start = parseISO(r.from), end = parseISO(r.to);
+  const days = Math.round((end - start) / 86400000) + 1;
+  const prevEnd = new Date(start); prevEnd.setDate(start.getDate()-1);
+  const prevStart = new Date(prevEnd); prevStart.setDate(prevEnd.getDate()-(days-1));
+  return { from: toISO(prevStart), to: toISO(prevEnd) };
 }
 
-/* ═══════════════════════════════════════════════════════
-   KPI COMPUTATION
-═══════════════════════════════════════════════════════ */
-function computeKPI(fbRows, igRows) {
-  const sum = (arr, k) => arr.reduce((a,r) => a + (r[k]||0), 0);
-  const fbViewers   = sum(fbRows, 'viewers');
-  const igReach     = sum(igRows, 'reach');
-  const fbInt       = sum(fbRows, 'interactions');
-  const igInt       = sum(igRows, 'interactions');
-  const fbFollows   = sum(fbRows, 'follows');
-  const igFollows   = sum(igRows, 'follows');
-  const fbViews     = sum(fbRows, 'views');
-  const igViews     = sum(igRows, 'views');
-  const fbVisits    = sum(fbRows, 'visits');
-  const igVisits    = sum(igRows, 'visits');
+function fbIn(r){ return OPTIMEDIA_DATA.facebook.metriche.filter(m=>inRange(m.data,r)); }
+function igIn(r){ return OPTIMEDIA_DATA.instagram.metriche.filter(m=>inRange(m.data,r)); }
+function sumRows(rows, col){ return rows.reduce((s,r)=>s+(r[col]||0), 0); }
 
-  const totalReach  = fbViewers + igReach;
-  const totalInt    = fbInt + igInt;
-  const er          = totalReach > 0 ? (totalInt / totalReach * 100) : 0;
-  const fbER        = fbViewers > 0 ? (fbInt / fbViewers * 100) : 0;
-  const igER        = igReach   > 0 ? (igInt  / igReach  * 100) : 0;
-
-  return { fbViewers, igReach, fbInt, igInt, fbFollows, igFollows,
-           fbViews, igViews, fbVisits, igVisits,
-           totalReach, totalInt, er, fbER, igER };
+function prevLabel(){
+  const map = { settimanale:'vs sett. prec.', mensile:'vs mese prec.', custom:'vs periodo prec.' };
+  return map[state.period] || 'vs periodo prec.';
 }
 
-/* ═══════════════════════════════════════════════════════
-   RENDER KPI
-═══════════════════════════════════════════════════════ */
-function renderKPI() {
-  const { from, to } = getDateRange();
-  const fbRows = filterMetriche(OPTIMEDIA_DATA.facebook.metriche, from, to);
-  const igRows = filterMetriche(OPTIMEDIA_DATA.instagram.metriche, from, to);
-  const K = computeKPI(fbRows, igRows);
-
-  // Cross-platform
-  document.getElementById('xReach').textContent    = fmt(K.totalReach);
-  document.getElementById('xReachSub').innerHTML   = `<b>FB</b> ${fmt(K.fbViewers)} &nbsp;·&nbsp; <b>IG</b> ${fmt(K.igReach)}`;
-  document.getElementById('xInt').textContent      = fmt(K.totalInt);
-  document.getElementById('xIntSub').innerHTML     = `<b>FB</b> ${fmt(K.fbInt)} &nbsp;·&nbsp; <b>IG</b> ${fmt(K.igInt)}`;
-  document.getElementById('xER').textContent       = K.er.toFixed(2) + '%';
-  document.getElementById('xERSub').innerHTML      = `<b>FB</b> ${K.fbER.toFixed(2)}% &nbsp;·&nbsp; <b>IG</b> ${K.igER.toFixed(2)}%`;
-  document.getElementById('xFollow').textContent   = `+${K.igFollows + K.fbFollows}`;
-  document.getElementById('xFollowSub').innerHTML  = `<b>IG</b> ${K.igFollows} follower &nbsp;·&nbsp; <b>FB</b> ${K.fbFollows} follow`;
-
-  // FB platform
-  document.getElementById('fbViews').textContent   = fmt(K.fbViews);
-  document.getElementById('fbViewers').textContent  = fmt(K.fbViewers);
-  document.getElementById('fbInt').textContent      = fmt(K.fbInt);
-  document.getElementById('fbER').textContent       = K.fbER.toFixed(2) + '%';
-  document.getElementById('fbVisits').textContent   = fmt(K.fbVisits);
-  document.getElementById('fbFollows').textContent  = '+' + K.fbFollows;
-
-  // IG platform
-  document.getElementById('igViews').textContent   = fmt(K.igViews);
-  document.getElementById('igReach').textContent    = fmt(K.igReach);
-  document.getElementById('igInt').textContent      = fmt(K.igInt);
-  document.getElementById('igER').textContent       = K.igER.toFixed(2) + '%';
-  document.getElementById('igVisits').textContent   = fmt(K.igVisits);
-  document.getElementById('igFollows').textContent  = '+' + K.igFollows;
-
-  // spike visibility
-  const spikeBox = document.getElementById('spikeBox');
-  spikeBox.style.display = (from <= '2026-05-22' && to >= '2026-05-18') ? 'flex' : 'none';
-
-  // period label
-  const lbl = document.getElementById('periodLabel');
-  lbl.textContent = fmtDate(from) + ' – ' + fmtDate(to) + ' 2026';
-
-  renderChart(fbRows, igRows);
+function deltaCard(curr, prev){
+  if(prev == null || prev === 0) return { txt:'—', cls:'neutral', pctTxt:'storico insufficiente' };
+  const diff = curr - prev;
+  const pct  = (diff/prev)*100;
+  const arr  = diff>0?'&#8593;':(diff<0?'&#8595;':'&rarr;');
+  const cls  = diff>0?'pos':(diff<0?'neg':'neutral');
+  const sign = diff>0?'+':'';
+  return {
+    txt: arr+' '+sign+nfInt.format(Math.abs(diff))+' ('+nfDec.format(pct)+'%)',
+    cls, pctTxt: prevLabel()
+  };
 }
 
-/* ═══════════════════════════════════════════════════════
-   CANVAS CHART — MINI RENDERER
-═══════════════════════════════════════════════════════ */
-let chartState = null;
+function kpiCardHTML(c){
+  const prevHtml  = c.prevVal != null ? '<div class="prev-val">'+prevLabel()+' <b>'+c.prevVal+'</b></div>' : '';
+  const deltaHtml = c.delta   ? '<div class="delta '+c.delta.cls+'">'+c.delta.txt+' <span style="color:var(--text-3);font-weight:400">&middot; '+c.delta.pctTxt+'</span></div>' : '';
+  const iBtn      = c.hint    ? '<span class="kpi-info">i<span class="kpi-tip">'+c.hint+'</span></span>' : '';
+  const subHtml   = c.sub     ? '<div class="sub-val">'+c.sub+'</div>' : '';
+  return '<div class="kpi"><div class="label">'+c.lbl+iBtn+'</div><div class="value">'+c.val+'</div>'+subHtml+prevHtml+deltaHtml+'</div>';
+}
 
-function renderChart(fbRows, igRows) {
-  const canvas = document.getElementById('trendCanvas');
-  const wrap   = document.getElementById('chartWrap');
-  canvas.width  = wrap.clientWidth  || 900;
-  canvas.height = wrap.clientHeight || 300;
+/* ============================================================
+   CHART — pure canvas 2D, no libraries
+   ============================================================ */
+function drawTrendChart(canvasId, fbRows, igRows, r){
+  const canvas = document.getElementById(canvasId);
+  if(!canvas) return;
 
-  const W = canvas.width;
-  const H = canvas.height;
+  // Build date axis covering the range
+  const dates = [];
+  { const cur = new Date(parseISO(r.from)), end = parseISO(r.to);
+    while(cur <= end){ dates.push(toISO(cur)); cur.setDate(cur.getDate()+1); } }
+
+  const fbMap = {}, igMap = {};
+  fbRows.forEach(m=>{ fbMap[m.data]=m; });
+  igRows.forEach(m=>{ igMap[m.data]=m; });
+
+  const fbViews    = dates.map(d=>(fbMap[d]||{}).views||0);
+  const igReach    = dates.map(d=>(igMap[d]||{}).reach||0);
+  const totInteract= dates.map(d=>((fbMap[d]||{}).interactions||0)+((igMap[d]||{}).interactions||0));
+
+  // Size canvas
+  const wrap = canvas.parentElement;
+  const W = wrap.offsetWidth || 860;
+  const H = 340;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
   const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
 
-  const PAD = { top:16, right:68, bottom:44, left:60 };
-  const plotW = W - PAD.left - PAD.right;
-  const plotH = H - PAD.top  - PAD.bottom;
+  const PAD = { top:24, right:72, bottom:44, left:68 };
+  const cW = W - PAD.left - PAD.right;
+  const cH = H - PAD.top  - PAD.bottom;
 
-  // Merge dates
-  const dates = fbRows.map(r=>r.data);
-  const igMap = {};
-  igRows.forEach(r => igMap[r.data] = r);
-  const fbMap = {};
-  fbRows.forEach(r => fbMap[r.data] = r);
+  const n = dates.length;
+  const maxViews = Math.max(...fbViews, ...igReach, 1);
+  const maxInt   = Math.max(...totInteract, 1);
 
-  const fbViews  = dates.map(d => fbMap[d]?.views || 0);
-  const igReach  = dates.map(d => igMap[d]?.reach || 0);
-  const totInt   = dates.map(d => (fbMap[d]?.interactions||0) + (igMap[d]?.interactions||0));
+  function scaleX(i){ return PAD.left + (i/(n-1||1))*cW; }
+  function scaleR(v){ return PAD.top + cH - (v/maxViews)*cH; } // right axis: views/reach
+  function scaleL(v){ return PAD.top + cH - (v/maxInt)*cH;   } // left axis: interactions
 
-  const maxRight = Math.max(...fbViews, ...igReach, 1);
-  const maxLeft  = Math.max(...totInt, 1);
-
-  const xScale = i => PAD.left + (i / Math.max(dates.length-1,1)) * plotW;
-  const yRight = v => PAD.top + plotH - (v / maxRight) * plotH;
-  const yLeft  = v => PAD.top + plotH - (v / maxLeft)  * plotH;
-
-  ctx.clearRect(0, 0, W, H);
-
-  // Grid lines
-  ctx.strokeStyle = 'oklch(89.5% 0.006 88)';
-  ctx.lineWidth = 1;
-  const gridN = 4;
-  for (let i=0; i<=gridN; i++) {
-    const y = PAD.top + (plotH / gridN) * i;
-    ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(W - PAD.right, y); ctx.stroke();
+  // Grid
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0,0,0,0.05)'; ctx.lineWidth=1;
+  for(let t=0;t<=4;t++){
+    const y = PAD.top + (t/4)*cH;
+    ctx.beginPath(); ctx.moveTo(PAD.left,y); ctx.lineTo(PAD.left+cW,y); ctx.stroke();
+    // Left axis (interactions)
+    ctx.fillStyle='#9B59B6'; ctx.font='10px system-ui,sans-serif'; ctx.textAlign='right';
+    ctx.fillText(nfInt.format(Math.round(maxInt*(1-t/4))), PAD.left-6, y+3.5);
+    // Right axis (views/reach)
+    const rv = maxViews*(1-t/4);
+    ctx.fillStyle='#86888A'; ctx.textAlign='left';
+    ctx.fillText(rv>=1000?(rv/1000).toFixed(0)+'k':Math.round(rv), PAD.left+cW+6, y+3.5);
   }
+  ctx.restore();
 
-  // Y axis left (interactions)
-  ctx.fillStyle = '#6B46C1';
-  ctx.font = '10px -apple-system,system-ui,sans-serif';
-  ctx.textAlign = 'right';
-  for (let i=0; i<=gridN; i++) {
-    const v = maxLeft * (1 - i/gridN);
-    const y = PAD.top + (plotH / gridN) * i;
-    ctx.fillText(fmt(Math.round(v)), PAD.left - 6, y+4);
-  }
-  // Y axis right (views/reach)
-  ctx.fillStyle = 'oklch(60% 0.005 250)';
-  ctx.textAlign = 'left';
-  for (let i=0; i<=gridN; i++) {
-    const v = maxRight * (1 - i/gridN);
-    const y = PAD.top + (plotH / gridN) * i;
-    ctx.fillText(fmt(Math.round(v)), W - PAD.right + 6, y+4);
-  }
-
-  // X axis labels
-  ctx.fillStyle = 'oklch(60% 0.005 250)';
-  ctx.textAlign = 'center';
-  const labelStep = Math.max(1, Math.floor(dates.length / 8));
-  dates.forEach((d,i) => {
-    if (i % labelStep === 0 || i === dates.length-1) {
-      ctx.fillText(fmtDate(d), xScale(i), H - 10);
+  // Spike band 18–22 mag
+  {
+    const si = dates.findIndex(d=>d>='2026-05-18');
+    const seArr = dates.findIndex(d=>d>'2026-05-22');
+    if(si !== -1){
+      const x1 = scaleX(si);
+      const x2 = seArr !== -1 ? scaleX(seArr-1) : scaleX(n-1);
+      ctx.save();
+      ctx.fillStyle='rgba(255,220,0,0.13)';
+      ctx.fillRect(x1, PAD.top, x2-x1+2, cH);
+      ctx.strokeStyle='rgba(180,140,0,0.4)'; ctx.lineWidth=1; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(x1,PAD.top); ctx.lineTo(x1,PAD.top+cH); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x2+1,PAD.top); ctx.lineTo(x2+1,PAD.top+cH); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle='#8A6206'; ctx.font='bold 9px system-ui,sans-serif'; ctx.textAlign='center';
+      ctx.fillText('⚡ Spike virale', (x1+x2)/2, PAD.top+14);
+      ctx.restore();
     }
-  });
+  }
 
-  function drawLine(vals, yFn, color, width, dashed) {
-    if (!vals.length) return;
+  // Draw area fill helper
+  function drawArea(data, scaleY, color){
+    if(data.length<2) return;
     ctx.save();
     ctx.beginPath();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = width;
-    if (dashed) ctx.setLineDash([4,4]);
-    vals.forEach((v,i) => {
-      const x = xScale(i), y = yFn(v);
-      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-    });
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  // Filled area for FB views
-  if (fbViews.length > 1) {
-    ctx.save();
-    ctx.beginPath();
-    fbViews.forEach((v,i) => {
-      const x = xScale(i), y = yRight(v);
-      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-    });
-    ctx.lineTo(xScale(fbViews.length-1), PAD.top + plotH);
-    ctx.lineTo(xScale(0), PAD.top + plotH);
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(24,119,242,0.07)';
-    ctx.fill();
-    ctx.restore();
-  }
-
-  // Filled area for IG reach
-  if (igReach.length > 1) {
-    ctx.save();
-    ctx.beginPath();
-    igReach.forEach((v,i) => {
-      const x = xScale(i), y = yRight(v);
-      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-    });
-    ctx.lineTo(xScale(igReach.length-1), PAD.top + plotH);
-    ctx.lineTo(xScale(0), PAD.top + plotH);
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(225,48,108,0.06)';
-    ctx.fill();
-    ctx.restore();
-  }
-
-  drawLine(fbViews, yRight, '#1877F2', 2);
-  drawLine(igReach, yRight, '#E1306C', 2);
-  drawLine(totInt,  yLeft,  '#6B46C1', 1.5, true);
-
-  // Dots on last point
-  function drawDot(vals, yFn, color) {
-    if (!vals.length) return;
-    const i = vals.length-1;
-    ctx.beginPath();
-    ctx.arc(xScale(i), yFn(vals[i]), 3.5, 0, Math.PI*2);
-    ctx.fillStyle = color;
-    ctx.fill();
-  }
-  drawDot(fbViews, yRight, '#1877F2');
-  drawDot(igReach, yRight, '#E1306C');
-  drawDot(totInt,  yLeft,  '#6B46C1');
-
-  // store state for tooltip
-  chartState = { dates, fbViews, igReach, totInt, xScale, yRight, yLeft,
-                 PAD, plotW, plotH, W, H };
-}
-
-/* ─── TOOLTIP ─── */
-const tooltip = document.getElementById('chartTooltip');
-
-function getCanvas() { return document.getElementById('trendCanvas'); }
-
-function onChartMove(e) {
-  if (!chartState) return;
-  const canvas = getCanvas();
-  const rect = canvas.getBoundingClientRect();
-  const cx = e.clientX - rect.left;
-  if (!chartState.dates.length) return;
-
-  const { dates, fbViews, igReach, totInt, xScale, PAD, plotW, plotH } = chartState;
-  // find closest index
-  let best = 0, bestDx = Infinity;
-  dates.forEach((d,i) => {
-    const dx = Math.abs(xScale(i) - cx);
-    if (dx < bestDx) { bestDx = dx; best = i; }
-  });
-  if (bestDx > plotW / dates.length + 8) { tooltip.style.display='none'; return; }
-
-  const d = dates[best];
-  tooltip.style.display = 'block';
-  tooltip.innerHTML = `
-    <div class="tt-date">${fmtDate(d)} 2026</div>
-    <div class="tt-row"><div class="tt-dot" style="background:#1877F2"></div><span class="tt-lbl">FB Views</span><span class="tt-v">${fmt(fbViews[best])}</span></div>
-    <div class="tt-row"><div class="tt-dot" style="background:#E1306C"></div><span class="tt-lbl">IG Reach</span><span class="tt-v">${fmt(igReach[best])}</span></div>
-    <div class="tt-row"><div class="tt-dot" style="background:#6B46C1"></div><span class="tt-lbl">Interazioni</span><span class="tt-v">${fmt(totInt[best])}</span></div>
-  `;
-  // position tooltip
-  const tW = tooltip.offsetWidth;
-  const tH = tooltip.offsetHeight;
-  let tx = e.clientX + 14;
-  let ty = e.clientY - tH/2;
-  if (tx + tW > window.innerWidth - 8) tx = e.clientX - tW - 14;
-  if (ty < 8) ty = 8;
-  tooltip.style.left = tx + 'px';
-  tooltip.style.top  = ty + 'px';
-}
-
-function onChartLeave() {
-  tooltip.style.display = 'none';
-}
-
-/* ═══════════════════════════════════════════════════════
-   AGE/GENDER BARS
-═══════════════════════════════════════════════════════ */
-function renderAgeGender(containerId, data, maleColor, femaleColor) {
-  const el = document.getElementById(containerId);
-  if (!el) return;
-  const maxTotal = Math.max(...data.map(r => r.uomini + r.donne), 1);
-  el.innerHTML = data.map(r => {
-    const tot = r.uomini + r.donne;
-    const mW  = (r.uomini / maxTotal * 100).toFixed(1);
-    const fW  = (r.donne  / maxTotal * 100).toFixed(1);
-    return `
-      <div class="ag-row">
-        <div class="ag-lbl">${r.fascia}</div>
-        <div class="ag-bars">
-          <div class="ag-m" style="width:${mW}%;background:${maleColor};height:14px;border-radius:3px 0 0 3px"></div>
-          <div class="ag-f" style="width:${fW}%;background:${femaleColor};height:14px;border-radius:0 3px 3px 0"></div>
-        </div>
-        <div class="ag-total">${tot.toFixed(1)}%</div>
-      </div>`;
-  }).join('');
-}
-
-/* ═══════════════════════════════════════════════════════
-   TABS
-═══════════════════════════════════════════════════════ */
-document.querySelectorAll('.tab').forEach(t => {
-  t.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
-    t.classList.add('active');
-    const id = 'tab-' + t.dataset.tab;
-    document.getElementById(id).classList.add('active');
-    if (t.dataset.tab === 'overview') {
-      setTimeout(() => { const {from,to}=getDateRange(); const fbR=filterMetriche(OPTIMEDIA_DATA.facebook.metriche,from,to); const igR=filterMetriche(OPTIMEDIA_DATA.instagram.metriche,from,to); renderChart(fbR,igR); }, 0);
+    ctx.moveTo(scaleX(0), scaleY(data[0]));
+    for(let i=1;i<data.length;i++){
+      const cpx=(scaleX(i-1)+scaleX(i))/2;
+      ctx.bezierCurveTo(cpx,scaleY(data[i-1]),cpx,scaleY(data[i]),scaleX(i),scaleY(data[i]));
     }
-  });
-});
-
-/* ═══════════════════════════════════════════════════════
-   PERIOD FILTER
-═══════════════════════════════════════════════════════ */
-document.querySelectorAll('.period-tab').forEach(t => {
-  t.addEventListener('click', () => {
-    document.querySelectorAll('.period-tab').forEach(x => x.classList.remove('active'));
-    t.classList.add('active');
-    activePeriod = t.dataset.period;
-    const customBar = document.getElementById('customBar');
-    customBar.classList.toggle('show', activePeriod === 'custom');
-    if (activePeriod !== 'custom') renderKPI();
-  });
-});
-
-document.getElementById('applyCustom').addEventListener('click', () => {
-  customFrom = document.getElementById('dateFrom').value;
-  customTo   = document.getElementById('dateTo').value;
-  if (customFrom > customTo) { [customFrom,customTo]=[customTo,customFrom]; }
-  renderKPI();
-});
-
-/* ═══════════════════════════════════════════════════════
-   LOGOUT
-═══════════════════════════════════════════════════════ */
-document.getElementById('logoutBtn').addEventListener('click', async () => {
-  try {
-    await fetch('/api/auth/logout', { method:'POST' });
-  } finally {
-    location.replace('/login');
+    ctx.lineTo(scaleX(data.length-1), PAD.top+cH);
+    ctx.lineTo(scaleX(0), PAD.top+cH);
+    ctx.closePath();
+    const g=ctx.createLinearGradient(0,PAD.top,0,PAD.top+cH);
+    g.addColorStop(0,color+'40'); g.addColorStop(1,color+'08');
+    ctx.fillStyle=g; ctx.fill();
+    ctx.restore();
   }
-});
 
-/* ═══════════════════════════════════════════════════════
-   CHART MOUSE
-═══════════════════════════════════════════════════════ */
-(function attachChartListeners() {
-  const canvas = document.getElementById('trendCanvas');
-  canvas.addEventListener('mousemove', onChartMove);
-  canvas.addEventListener('mouseleave', onChartLeave);
+  // Draw line helper
+  function drawLine2(data, scaleY, color, dashed){
+    if(data.length<2) return;
+    ctx.save();
+    ctx.strokeStyle=color; ctx.lineWidth=dashed?1.8:2.2; ctx.lineJoin='round';
+    if(dashed) ctx.setLineDash([5,4]);
+    ctx.beginPath();
+    ctx.moveTo(scaleX(0), scaleY(data[0]));
+    for(let i=1;i<data.length;i++){
+      const cpx=(scaleX(i-1)+scaleX(i))/2;
+      ctx.bezierCurveTo(cpx,scaleY(data[i-1]),cpx,scaleY(data[i]),scaleX(i),scaleY(data[i]));
+    }
+    ctx.stroke(); ctx.setLineDash([]); ctx.restore();
+  }
+
+  drawArea(fbViews, scaleR, '#1877F2');
+  drawArea(igReach, scaleR, '#E1306C');
+  drawLine2(fbViews, scaleR, '#1877F2', false);
+  drawLine2(igReach, scaleR, '#E1306C', false);
+  drawLine2(totInteract, scaleL, '#7B3FE4', true);
+
+  // X-axis date labels
+  ctx.fillStyle='#86888A'; ctx.font='10px system-ui,sans-serif'; ctx.textAlign='center';
+  const step = Math.max(1, Math.floor(n/8));
+  for(let i=0;i<n;i+=step){
+    const [,mo,d]=dates[i].split('-');
+    ctx.fillText(d+'/'+mo, scaleX(i), PAD.top+cH+16);
+  }
+  // Always last date
+  {const [,mo,d]=dates[n-1].split('-'); ctx.fillText(d+'/'+mo, scaleX(n-1), PAD.top+cH+16);}
+
+  // Axis labels
+  ctx.save();
+  ctx.fillStyle='#9B59B6'; ctx.font='10px system-ui,sans-serif';
+  ctx.translate(12, PAD.top+cH/2); ctx.rotate(-Math.PI/2);
+  ctx.textAlign='center'; ctx.fillText('Interazioni',0,0); ctx.restore();
+
+  ctx.save();
+  ctx.fillStyle='#86888A'; ctx.font='10px system-ui,sans-serif';
+  ctx.translate(W-10, PAD.top+cH/2); ctx.rotate(Math.PI/2);
+  ctx.textAlign='center'; ctx.fillText('Views / Reach',0,0); ctx.restore();
+
+  // Store data for tooltip
+  canvas._td = { dates, fbViews, igReach, totInteract, scaleX, scaleR, scaleL, PAD, W, H };
+}
+
+// Tooltip
+(function(){
+  let tip = null;
+  function getTip(){
+    if(!tip){
+      tip = document.createElement('div');
+      tip.style.cssText='position:fixed;background:#1D2226;color:#fff;font-size:11.5px;line-height:1.65;padding:9px 13px;border-radius:7px;pointer-events:none;box-shadow:0 4px 18px rgba(0,0,0,.3);z-index:999;white-space:nowrap;opacity:0;transition:opacity .1s';
+      document.body.appendChild(tip);
+    }
+    return tip;
+  }
+  window._attachTip = function(canvas){
+    canvas.addEventListener('mousemove', function(e){
+      const td=canvas._td; if(!td) return;
+      const rect=canvas.getBoundingClientRect();
+      const mx=e.clientX-rect.left;
+      let best=0, bd=Infinity;
+      for(let i=0;i<td.dates.length;i++){
+        const dist=Math.abs(mx-td.scaleX(i));
+        if(dist<bd){bd=dist;best=i;}
+      }
+      if(bd>28){getTip().style.opacity='0';return;}
+      const [y,mo,d]=td.dates[best].split('-');
+      const t=getTip();
+      t.innerHTML='<b>'+d+'/'+mo+'/'+y+'</b><br>'
+        +'<span style="color:#60A5FA">&#9632;</span> FB Views: <b>'+nfInt.format(td.fbViews[best])+'</b><br>'
+        +'<span style="color:#F472B6">&#9632;</span> IG Reach: <b>'+nfInt.format(td.igReach[best])+'</b><br>'
+        +'<span style="color:#C4B5FD">&#9632;</span> Interazioni: <b>'+nfInt.format(td.totInteract[best])+'</b>';
+      t.style.opacity='1';
+      t.style.left=(e.clientX+16)+'px';
+      t.style.top=(e.clientY-12)+'px';
+    });
+    canvas.addEventListener('mouseleave',function(){getTip().style.opacity='0';});
+  };
 })();
 
-/* ═══════════════════════════════════════════════════════
-   RESIZE
-═══════════════════════════════════════════════════════ */
-let resizeTimer;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => {
-    const { from, to } = getDateRange();
-    const fbR = filterMetriche(OPTIMEDIA_DATA.facebook.metriche, from, to);
-    const igR = filterMetriche(OPTIMEDIA_DATA.instagram.metriche, from, to);
-    renderChart(fbR, igR);
-  }, 100);
+/* ============================================================
+   RENDER: PANORAMICA
+   ============================================================ */
+function renderOverview(r, prev){
+  const fb = fbIn(r), ig = igIn(r);
+  const fbP= fbIn(prev), igP= igIn(prev);
+  const hasPrev = fbP.length>0 || igP.length>0;
+
+  // Cross-platform KPIs
+  const reach      = sumRows(fb,'viewers') + sumRows(ig,'reach');
+  const reachP     = sumRows(fbP,'viewers')+ sumRows(igP,'reach');
+  const ints       = sumRows(fb,'interactions') + sumRows(ig,'interactions');
+  const intsP      = sumRows(fbP,'interactions')+ sumRows(igP,'interactions');
+  const erPond     = reach>0 ? (ints/reach)*100 : 0;
+  const erPondP    = reachP>0 ? (intsP/reachP)*100 : null;
+  const newFol     = sumRows(fb,'follows') + sumRows(ig,'follows');
+  const newFolP    = sumRows(fbP,'follows')+ sumRows(igP,'follows');
+
+  const crossCards = [
+    {
+      lbl:'Reach Totale',
+      hint:'Facebook Viewers unici + Instagram Reach nel periodo selezionato',
+      val: fmt(reach),
+      prevVal: hasPrev ? fmt(reachP) : null,
+      delta:   hasPrev ? deltaCard(reach, reachP) : null,
+    },
+    {
+      lbl:'Interazioni Totali',
+      hint:'Facebook Interactions + Instagram Interactions nel periodo',
+      val: fmt(ints),
+      prevVal: hasPrev ? fmt(intsP) : null,
+      delta:   hasPrev ? deltaCard(ints, intsP) : null,
+    },
+    {
+      lbl:'ER Medio Ponderato',
+      hint:'(FB Interactions + IG Interactions) / (FB Viewers + IG Reach) x 100',
+      val: fmtPct(erPond),
+      prevVal: hasPrev && erPondP!=null ? fmtPct(erPondP) : null,
+      delta: hasPrev && erPondP!=null ? {
+        txt:(erPond>=erPondP?'&#8593;':'&#8595;')+' '+nfDec.format(Math.abs(erPond-erPondP))+' pp',
+        cls: erPond>=erPondP?'pos':'neg',
+        pctTxt: prevLabel()
+      } : null,
+    },
+    {
+      lbl:'Nuovi Follower',
+      hint:'Nuovi follow FB + nuovi follow IG nel periodo (da dati giornalieri)',
+      val: newFol>0 ? '+'+fmt(newFol) : fmt(newFol),
+      prevVal: hasPrev ? (newFolP>0?'+'+fmt(newFolP):fmt(newFolP)) : null,
+      delta: hasPrev ? deltaCard(newFol, newFolP) : null,
+    },
+  ];
+  document.getElementById('kpiCross').innerHTML = crossCards.map(kpiCardHTML).join('');
+
+  // Spike callout
+  document.getElementById('spikeCallout').style.display =
+    (r.from <= '2026-05-22' && r.to >= '2026-05-18') ? '' : 'none';
+
+  // Trend chart
+  drawTrendChart('chartTrend', fb, ig, r);
+  const cnv = document.getElementById('chartTrend');
+  if(cnv && window._attachTip) window._attachTip(cnv);
+
+  // Platform KPIs
+  renderFbKpis(fb, fbP, hasPrev);
+  renderIgKpis(ig, igP, hasPrev);
+}
+
+function platKpiHtml(lbl, valHtml, deltaHtml){
+  return '<div class="platform-kpi"><div class="lbl">'+lbl+'</div><div class="val">'+valHtml+'</div>'+deltaHtml+'</div>';
+}
+
+function smDelta(curr, prevV, hasPrev){
+  if(!hasPrev || prevV===null) return '';
+  const d = deltaCard(curr, prevV);
+  return '<div class="delta-sm '+d.cls+'">'+d.txt+'</div>';
+}
+
+function erDelta(erVal, erPVal, hasPrev){
+  if(!hasPrev || erPVal===null) return '';
+  const diff = erVal - erPVal;
+  const cls = diff>=0?'pos':'neg';
+  const arr = diff>=0?'&#8593;':'&#8595;';
+  return '<div class="delta-sm '+cls+'">'+arr+' '+nfDec.format(Math.abs(diff))+' pp</div>';
+}
+
+function renderFbKpis(rows, prevRows, hasPrev){
+  const views   = sumRows(rows,'views'),    viewsP  = sumRows(prevRows,'views');
+  const viewers = sumRows(rows,'viewers'),  viewersP= sumRows(prevRows,'viewers');
+  const ints    = sumRows(rows,'interactions'), intsP=sumRows(prevRows,'interactions');
+  const visits  = sumRows(rows,'visits'),   visitsP = sumRows(prevRows,'visits');
+  const follows = sumRows(rows,'follows'),  followsP= sumRows(prevRows,'follows');
+  const erVal   = viewers>0?(ints/viewers)*100:0;
+  const erPVal  = viewersP>0?(intsP/viewersP)*100:null;
+
+  document.getElementById('fbKpis').innerHTML =
+    platKpiHtml('Views',          '<span class="fb-color">'+fmt(views)+'</span>',        smDelta(views,viewsP,hasPrev))+
+    platKpiHtml('Viewers unici',  '<span class="fb-color">'+fmt(viewers)+'</span>',      smDelta(viewers,viewersP,hasPrev))+
+    platKpiHtml('Interazioni',    '<span class="fb-color">'+fmt(ints)+'</span>',         smDelta(ints,intsP,hasPrev))+
+    platKpiHtml('Visite pagina',  '<span class="fb-color">'+fmt(visits)+'</span>',       smDelta(visits,visitsP,hasPrev))+
+    platKpiHtml('Nuovi follow',   '<span class="fb-color">'+(follows>0?'+':'')+fmt(follows)+'</span>', smDelta(follows,followsP,hasPrev))+
+    platKpiHtml('ER %',           '<span class="fb-color">'+fmtPct(erVal)+'</span>',     erDelta(erVal,erPVal,hasPrev));
+}
+
+function renderIgKpis(rows, prevRows, hasPrev){
+  const views   = sumRows(rows,'views'),    viewsP  = sumRows(prevRows,'views');
+  const reach   = sumRows(rows,'reach'),    reachP  = sumRows(prevRows,'reach');
+  const ints    = sumRows(rows,'interactions'), intsP=sumRows(prevRows,'interactions');
+  const visits  = sumRows(rows,'visits'),   visitsP = sumRows(prevRows,'visits');
+  const follows = sumRows(rows,'follows'),  followsP= sumRows(prevRows,'follows');
+  const erVal   = reach>0?(ints/reach)*100:0;
+  const erPVal  = reachP>0?(intsP/reachP)*100:null;
+
+  document.getElementById('igKpis').innerHTML =
+    platKpiHtml('Views',           '<span class="ig-color">'+fmt(views)+'</span>',       smDelta(views,viewsP,hasPrev))+
+    platKpiHtml('Reach',           '<span class="ig-color">'+fmt(reach)+'</span>',       smDelta(reach,reachP,hasPrev))+
+    platKpiHtml('Interazioni',     '<span class="ig-color">'+fmt(ints)+'</span>',        smDelta(ints,intsP,hasPrev))+
+    platKpiHtml('Visite profilo',  '<span class="ig-color">'+fmt(visits)+'</span>',      smDelta(visits,visitsP,hasPrev))+
+    platKpiHtml('Nuovi follow',    '<span class="ig-color">'+(follows>0?'+':'')+fmt(follows)+'</span>', smDelta(follows,followsP,hasPrev))+
+    platKpiHtml('ER %',            '<span class="ig-color">'+fmtPct(erVal)+'</span>',    erDelta(erVal,erPVal,hasPrev));
+}
+
+/* ============================================================
+   RENDER: ANALISI SETTIMANALE
+   ============================================================ */
+function renderSettimanale(){
+  function isoWeek(iso){
+    const d=parseISO(iso), day=d.getDay()||7;
+    d.setDate(d.getDate()+4-day);
+    const y1=new Date(d.getFullYear(),0,1);
+    const wk=Math.ceil(((d-y1)/86400000+1)/7);
+    return d.getFullYear()+'-W'+String(wk).padStart(2,'0');
+  }
+  function weekLabel(wk){
+    const [yr,w]=wk.split('-W');
+    const j4=new Date(+yr,0,4);
+    const s=new Date(j4); s.setDate(j4.getDate()-(j4.getDay()||7)+1+(parseInt(w)-1)*7);
+    const e=new Date(s); e.setDate(s.getDate()+6);
+    const fs=d=>String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');
+    return fs(s)+'&ndash;'+fs(e);
+  }
+
+  const weeks={};
+  OPTIMEDIA_DATA.facebook.metriche.forEach(m=>{
+    const wk=isoWeek(m.data);
+    if(!weeks[wk]) weeks[wk]={wk,fbViews:0,igReach:0,ints:0,fbViewers:0,igR:0};
+    weeks[wk].fbViews+=m.views; weeks[wk].fbViewers+=m.viewers; weeks[wk].ints+=m.interactions;
+  });
+  OPTIMEDIA_DATA.instagram.metriche.forEach(m=>{
+    const wk=isoWeek(m.data);
+    if(!weeks[wk]) weeks[wk]={wk,fbViews:0,igReach:0,ints:0,fbViewers:0,igR:0};
+    weeks[wk].igReach+=m.reach; weeks[wk].igR+=m.reach; weeks[wk].ints+=m.interactions;
+  });
+  const sorted=Object.values(weeks).sort((a,b)=>a.wk.localeCompare(b.wk));
+
+  function dHtml(curr,prev){
+    if(prev==null) return '<span class="d-neu">&mdash;</span>';
+    const diff=curr-prev, pct=prev>0?(diff/prev)*100:0;
+    const sign=diff>=0?'+':'', cls=diff>0?'d-pos':diff<0?'d-neg':'d-neu';
+    const arr=diff>0?'&#8593;':diff<0?'&#8595;':'&rarr;';
+    return '<span class="'+cls+'">'+arr+' '+sign+nfInt.format(Math.abs(diff))+(prev>0?' ('+sign+nfDec.format(pct)+'%)':'')+'</span>';
+  }
+
+  document.getElementById('weeklyBody').innerHTML = sorted.map((w,i)=>{
+    const prev=i>0?sorted[i-1]:null;
+    const totalR=w.fbViewers+w.igR;
+    const er=totalR>0?(w.ints/totalR)*100:0;
+    return '<tr>'
+      +'<td><b>'+weekLabel(w.wk)+'</b> <span style="color:var(--text-3);font-size:11px">'+w.wk+'</span></td>'
+      +'<td class="num" style="color:var(--fb)">'+fmt(w.fbViews)+'</td>'
+      +'<td class="num" style="color:var(--ig)">'+fmt(w.igReach)+'</td>'
+      +'<td class="num">'+fmt(w.ints)+'</td>'
+      +'<td class="num">'+fmtPct(er)+'</td>'
+      +'<td class="num">'+dHtml(w.ints,prev?prev.ints:null)+'</td>'
+      +'</tr>';
+  }).join('') || '<tr><td colspan="6" style="color:var(--text-3);text-align:center;padding:20px">Nessun dato</td></tr>';
+}
+
+/* ============================================================
+   RENDER: AUDIENCE
+   ============================================================ */
+function renderAudience(r){
+  // Countries
+  const fbC=OPTIMEDIA_DATA.facebook.audience.top_countries;
+  const igC=OPTIMEDIA_DATA.instagram.audience.top_countries;
+  const allC=[...new Set([...fbC.map(x=>x.paese),...igC.map(x=>x.paese)])];
+  const fbCM=Object.fromEntries(fbC.map(x=>[x.paese,x.pct]));
+  const igCM=Object.fromEntries(igC.map(x=>[x.paese,x.pct]));
+
+  document.getElementById('audienceCountries').innerHTML = allC.map(p=>{
+    const fp=fbCM[p]||0, ip=igCM[p]||0, mx=Math.max(fp,ip,1);
+    return '<div style="margin-bottom:14px">'
+      +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px">'
+      +'<span style="font-weight:600">'+p+'</span>'
+      +'<span style="font-size:11px;color:var(--text-3)">'
+      +(fp>0?'<span style="color:var(--fb)">FB '+fmtPct(fp)+'</span>':''
+      )+(fp>0&&ip>0?' &middot; ':''
+      )+(ip>0?'<span style="color:var(--ig)">IG '+fmtPct(ip)+'</span>':'')
+      +'</span></div>'
+      +(fp>0?'<div class="h-bar-track"><div class="h-bar-fill" style="width:'+((fp/mx)*100).toFixed(1)+'%;background:var(--fb)"></div></div>':'')
+      +(ip>0?'<div class="h-bar-track" style="margin-top:4px"><div class="h-bar-fill" style="width:'+((ip/mx)*100).toFixed(1)+'%;background:var(--ig)"></div></div>':'')
+      +'</div>';
+  }).join('');
+
+  // Cities
+  const fbCi=OPTIMEDIA_DATA.facebook.audience.top_cities;
+  const igCi=OPTIMEDIA_DATA.instagram.audience.top_cities;
+  const citM={};
+  fbCi.forEach(c=>{ if(!citM[c.citta]) citM[c.citta]={c:c.citta,fp:0,ip:0}; citM[c.citta].fp=c.pct; });
+  igCi.forEach(c=>{ if(!citM[c.citta]) citM[c.citta]={c:c.citta,fp:0,ip:0}; citM[c.citta].ip=c.pct; });
+  const cities=Object.values(citM).sort((a,b)=>Math.max(b.fp,b.ip)-Math.max(a.fp,a.ip));
+  const mxC=Math.max(...cities.map(c=>Math.max(c.fp,c.ip)),1);
+
+  document.getElementById('audienceCities').innerHTML = cities.map(c=>`
+    <div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px">
+        <span style="font-weight:600">${c.c}</span>
+        <span style="font-size:11px;color:var(--text-3)">
+          ${c.fp>0?'<span style="color:var(--fb)">FB '+fmtPct(c.fp)+'</span>':''}
+          ${c.fp>0&&c.ip>0?' &middot; ':''}
+          ${c.ip>0?'<span style="color:var(--ig)">IG '+fmtPct(c.ip)+'</span>':''}
+        </span>
+      </div>
+      ${c.fp>0?'<div class="h-bar-track"><div class="h-bar-fill" style="width:'+((c.fp/mxC)*100).toFixed(1)+'%;background:var(--fb)"></div></div>':''}
+      ${c.ip>0?'<div class="h-bar-track" style="margin-top:4px"><div class="h-bar-fill" style="width:'+((c.ip/mxC)*100).toFixed(1)+'%;background:var(--ig)"></div></div>':''}
+    </div>`).join('');
+
+  // Age/Gender FB
+  const fbAG=OPTIMEDIA_DATA.facebook.audience.age_gender;
+  const mxFB=Math.max(...fbAG.flatMap(f=>[f.uomini,f.donne]),1);
+  document.getElementById('fbAgeGender').innerHTML = fbAG.map(f=>
+    '<div class="age-row"><div class="age-lbl">'+f.fascia+'</div>'
+    +'<div><div class="age-bar-m" style="width:'+Math.round(f.uomini/mxFB*180)+'px"></div>'
+    +'<div style="font-size:10.5px;color:var(--fb);margin-top:1px">'+nfDec.format(f.uomini)+'%</div>'
+    +'<div class="age-bar-f" style="width:'+Math.round(f.donne/mxFB*180)+'px;margin-top:3px"></div>'
+    +'<div style="font-size:10.5px;color:var(--ig);margin-top:1px">'+nfDec.format(f.donne)+'%</div></div></div>'
+  ).join('');
+
+  // Age/Gender IG
+  const igAG=OPTIMEDIA_DATA.instagram.audience.age_gender;
+  const mxIG=Math.max(...igAG.flatMap(f=>[f.uomini,f.donne]),1);
+  document.getElementById('igAgeGender').innerHTML = igAG.map(f=>
+    '<div class="age-row"><div class="age-lbl">'+f.fascia+'</div>'
+    +'<div><div class="age-bar-m" style="width:'+Math.round(f.uomini/mxIG*180)+'px"></div>'
+    +'<div style="font-size:10.5px;color:var(--fb);margin-top:1px">'+nfDec.format(f.uomini)+'%</div>'
+    +'<div class="age-bar-f" style="width:'+Math.round(f.donne/mxIG*180)+'px;margin-top:3px"></div>'
+    +'<div style="font-size:10.5px;color:var(--ig);margin-top:1px">'+nfDec.format(f.donne)+'%</div></div></div>'
+  ).join('');
+
+  // IG new followers in period
+  const igFol=r?sumRows(igIn(r),'follows'):0;
+  document.getElementById('igNewFollowers').textContent=(igFol>0?'+':'')+fmt(igFol);
+}
+
+/* ============================================================
+   MASTER RENDER
+   ============================================================ */
+function render(){
+  const r    = getRange();
+  const prev = getPrevRange(r);
+  const days = fbIn(r).length || igIn(r).length;
+  document.getElementById('periodRange').textContent = 'Range: '+fmtDate(r.from)+' → '+fmtDate(r.to)+' · '+days+' giorni';
+  document.getElementById('lastUpdate').textContent  = fmtDate(OPTIMEDIA_DATA.meta.aggiornato);
+
+  if(state.tab==='overview')    renderOverview(r, prev);
+  if(state.tab==='settimanale') renderSettimanale();
+  if(state.tab==='audience')    renderAudience(r);
+}
+
+/* ============================================================
+   TAB SWITCH
+   ============================================================ */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    state.tab=t.dataset.tab;
+    document.getElementById('tab-'+state.tab).classList.add('active');
+    render();
+  });
 });
 
-/* ═══════════════════════════════════════════════════════
+/* ============================================================
+   PERIOD SWITCH
+   ============================================================ */
+document.querySelectorAll('#periodTabs .period-tab').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    document.querySelectorAll('#periodTabs .period-tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    state.period=t.dataset.p;
+    const cust=document.getElementById('periodCustom');
+    cust.classList.toggle('show', state.period==='custom');
+    if(state.period==='custom'){
+      const r=getRange();
+      document.getElementById('dateFrom').value=r.from;
+      document.getElementById('dateTo').value=r.to;
+    }
+    render();
+  });
+});
+document.getElementById('applyCustom').addEventListener('click', ()=>{
+  state.customFrom=document.getElementById('dateFrom').value;
+  state.customTo  =document.getElementById('dateTo').value;
+  render();
+});
+
+/* ============================================================
+   LOGOUT
+   ============================================================ */
+document.getElementById('logoutBtn').addEventListener('click', async ()=>{
+  await fetch('/api/auth/logout', { method:'POST' });
+  location.replace('/login');
+});
+
+/* ============================================================
    INIT
-═══════════════════════════════════════════════════════ */
-renderKPI();
-renderAgeGender('fbAgeGender', OPTIMEDIA_DATA.facebook.audience.age_gender, '#1877F2', '#F77737');
-renderAgeGender('igAgeGender', OPTIMEDIA_DATA.instagram.audience.age_gender, '#E1306C', '#F77737');
+   ============================================================ */
+render();
 </script>
 </body>
 </html>

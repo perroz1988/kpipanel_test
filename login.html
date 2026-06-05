@@ -3,21 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RS Italia – Accesso</title>
+<title>KPI Dashboard — Accesso</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:      oklch(96.5% 0.006 88);
-  --card:    oklch(99.5% 0.002 88);
-  --border:  oklch(89.5% 0.006 88);
-  --text:    oklch(18% 0.012 250);
-  --text-2:  oklch(48% 0.006 250);
-  --text-3:  oklch(60% 0.005 250);
-  --blue:    oklch(44% 0.168 255.5);
-  --blue-h:  oklch(38% 0.168 255.5);
-  --neg:     oklch(40% 0.19 25);
-  --rs:      oklch(48% 0.21 25);
+  --bg:     oklch(96.5% 0.006 88);
+  --card:   oklch(99.5% 0.002 88);
+  --border: oklch(89.5% 0.006 88);
+  --text:   oklch(18% 0.012 250);
+  --text-2: oklch(48% 0.006 250);
+  --text-3: oklch(64% 0.005 250);
+  --accent: oklch(44% 0.155 265);
+  --accent-h: oklch(38% 0.155 265);
+  --neg:    oklch(40% 0.19 25);
 }
 
 body {
@@ -33,54 +32,57 @@ body {
 .card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 40px 36px;
+  border-radius: 12px;
+  padding: 44px 40px;
   width: 100%;
   max-width: 360px;
-  box-shadow: 0 2px 12px oklch(0% 0 0 / 0.06);
+  box-shadow: 0 2px 16px oklch(0% 0 0 / 0.06);
 }
 
-.brand {
+.logo {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 28px;
+  gap: 11px;
+  margin-bottom: 32px;
 }
 
-.brand-mark {
-  width: 36px;
-  height: 36px;
-  background: var(--rs);
-  border-radius: 6px;
+.logo-mark {
+  width: 38px;
+  height: 38px;
+  background: var(--accent);
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
-  font-weight: 800;
-  color: #fff;
-  letter-spacing: -0.5px;
   flex-shrink: 0;
 }
 
-.brand-text {
-  line-height: 1.25;
+.logo-mark svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.brand-text strong {
+.logo-text strong {
   display: block;
   font-size: 14px;
   font-weight: 700;
   color: var(--text);
+  line-height: 1.2;
 }
 
-.brand-text span {
+.logo-text span {
   font-size: 11px;
   color: var(--text-3);
   font-weight: 500;
 }
 
 h1 {
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 700;
   margin-bottom: 4px;
 }
@@ -88,21 +90,20 @@ h1 {
 .subtitle {
   font-size: 13px;
   color: var(--text-2);
-  margin-bottom: 24px;
+  margin-bottom: 26px;
+  line-height: 1.45;
 }
 
-.field {
-  margin-bottom: 14px;
-}
+.field { margin-bottom: 14px; }
 
 label {
   display: block;
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
   color: var(--text-2);
   margin-bottom: 5px;
-  text-transform: uppercase;
 }
 
 input {
@@ -114,34 +115,35 @@ input {
   color: var(--text);
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 7px;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 input:focus {
-  border-color: var(--blue);
-  box-shadow: 0 0 0 3px oklch(44% 0.168 255.5 / 0.12);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px oklch(44% 0.155 265 / 0.12);
 }
 
 button {
   display: block;
   width: 100%;
-  margin-top: 20px;
+  margin-top: 22px;
   padding: 10px;
   font-size: 14px;
   font-weight: 600;
   font-family: inherit;
   color: #fff;
-  background: var(--blue);
+  background: var(--accent);
   border: none;
-  border-radius: 6px;
+  border-radius: 7px;
   cursor: pointer;
   transition: background 0.15s;
+  letter-spacing: 0.1px;
 }
 
-button:hover:not(:disabled) { background: var(--blue-h); }
-button:disabled { opacity: 0.6; cursor: not-allowed; }
+button:hover:not(:disabled) { background: var(--accent-h); }
+button:disabled { opacity: 0.55; cursor: not-allowed; }
 
 .error {
   display: none;
@@ -149,31 +151,44 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
   padding: 9px 12px;
   font-size: 13px;
   color: var(--neg);
-  background: oklch(40% 0.19 25 / 0.08);
-  border: 1px solid oklch(40% 0.19 25 / 0.2);
-  border-radius: 6px;
+  background: oklch(40% 0.19 25 / 0.07);
+  border: 1px solid oklch(40% 0.19 25 / 0.18);
+  border-radius: 7px;
+  line-height: 1.4;
 }
 
 .error.visible { display: block; }
+
+.footer {
+  margin-top: 28px;
+  font-size: 11px;
+  color: var(--text-3);
+  text-align: center;
+  line-height: 1.5;
+}
 </style>
 </head>
 <body>
 <div class="card">
-  <div class="brand">
-    <div class="brand-mark">RS</div>
-    <div class="brand-text">
-      <strong>RS Italia</strong>
-      <span>LinkedIn Dashboard</span>
+  <div class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <strong>KPI Dashboard</strong>
+      <span>Analytics Platform</span>
     </div>
   </div>
 
   <h1>Accedi</h1>
-  <p class="subtitle">Inserisci le tue credenziali per continuare.</p>
+  <p class="subtitle">Inserisci le credenziali ricevute per accedere alla tua dashboard.</p>
 
   <form id="form" novalidate>
     <div class="field">
       <label for="email">Email</label>
-      <input id="email" type="email" autocomplete="email" required placeholder="nome@rsitalia.it">
+      <input id="email" type="email" autocomplete="email" required placeholder="nome@azienda.it">
     </div>
     <div class="field">
       <label for="password">Password</label>
@@ -182,6 +197,8 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
     <button type="submit" id="btn">Accedi</button>
     <div class="error" id="error"></div>
   </form>
+
+  <p class="footer">Accesso riservato · Per assistenza contatta il tuo referente</p>
 </div>
 
 <script>
@@ -200,7 +217,7 @@ form.addEventListener('submit', async e => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email: document.getElementById('email').value,
+        email: document.getElementById('email').value.trim(),
         password: document.getElementById('password').value
       })
     });
@@ -208,7 +225,7 @@ form.addEventListener('submit', async e => {
     const data = await res.json();
 
     if (!res.ok) {
-      err.textContent = data.error || 'Errore di accesso';
+      err.textContent = data.error || 'Credenziali non valide.';
       err.className = 'error visible';
       btn.disabled = false;
       btn.textContent = 'Accedi';
@@ -216,9 +233,10 @@ form.addEventListener('submit', async e => {
     }
 
     const params = new URLSearchParams(location.search);
-    const next = params.get('next');
+    const next   = params.get('next');
     const dashMap = { 'rs-italia': '/rs-italia', 'optimedia': '/optimedia' };
     location.href = next || dashMap[data.dashboard] || '/rs-italia';
+
   } catch {
     err.textContent = 'Errore di rete. Riprova.';
     err.className = 'error visible';
