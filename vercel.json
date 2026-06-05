@@ -1,8 +1,9 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/dashboard.html" },
+    { "source": "/rs-italia", "destination": "/dashboard.html" },
     { "source": "/optimedia", "destination": "/optimedia.html" },
-    { "source": "/login", "destination": "/login.html" }
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/", "destination": "/login.html" }
   ],
   "headers": [
     {

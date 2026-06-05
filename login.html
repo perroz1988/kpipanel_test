@@ -217,8 +217,8 @@ form.addEventListener('submit', async e => {
 
     const params = new URLSearchParams(location.search);
     const next = params.get('next');
-    const dashMap = { 'optimedia': '/optimedia' };
-    location.href = next || dashMap[data.dashboard] || '/';
+    const dashMap = { 'rs-italia': '/rs-italia', 'optimedia': '/optimedia' };
+    location.href = next || dashMap[data.dashboard] || '/rs-italia';
   } catch {
     err.textContent = 'Errore di rete. Riprova.';
     err.className = 'error visible';
