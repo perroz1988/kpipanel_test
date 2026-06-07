@@ -386,6 +386,10 @@ body.print-mode .row-4, body.print-mode .card, body.print-mode .kpi { break-insi
 fetch('/api/auth/verify')
   .then(r => { if (!r.ok) throw 0; return r.json(); })
   .then(u => {
+    // Verifica che l'utente sia autorizzato per questa dashboard
+    const allowed = u.role === 'admin' || u.dashboard === 'rs-italia';
+    if (!allowed) { location.replace('/login'); return; }
+
     document.getElementById('auth-veil').remove();
     const isAdmin = u.role === 'admin';
     if (window._setExportAdmin) window._setExportAdmin(isAdmin);

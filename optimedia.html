@@ -178,8 +178,13 @@ canvas.trend-canvas { display:block; width:100%; }
 <script>
 /* ---- Auth veil ---- */
 fetch('/api/auth/verify')
-  .then(r => { if(!r.ok) throw 0; })
-  .then(() => { document.getElementById('auth-veil').remove(); })
+  .then(r => { if(!r.ok) throw 0; return r.json(); })
+  .then(u => {
+    // Verifica che l'utente sia autorizzato per questa dashboard
+    const allowed = u.role === 'admin' || u.dashboard === 'optimedia';
+    if (!allowed) { location.replace('/login'); return; }
+    document.getElementById('auth-veil').remove();
+  })
   .catch(() => location.replace('/login?next=' + encodeURIComponent(location.pathname)));
 </script>
 </head>
