@@ -1183,7 +1183,8 @@ def parse_campaign_csv(path):
 
 def parse_creative_performance_report(path):
     """Parsa il Creative Performance Report di LinkedIn (usa CSV reader).
-    Colonna 28: Impressions, 29: Clicks, 30: CTR, 21: Ad Introduction Text (post identifier)."""
+    Colonne: 19=Ad ID, 21=Ad Intro, 27=Spent, 28=Imp, 29=Clicks, 30=CTR,
+    33=Reactions, 34=Comments, 35=Shares, 40=ER, 63=Reach"""
     import csv
     with open(path, 'r', encoding='utf-16') as f:
         reader = csv.reader(f, delimiter='\t')
@@ -1193,36 +1194,47 @@ def parse_creative_performance_report(path):
     if len(lines) < 6:
         return []
 
-    # Colonne: 19=Ad ID, 21=Ad Introduction Text (post id), 28=Impressions, 29=Clicks, 30=CTR
+    def fv(cells, i):
+        try:
+            val = str(cells[i]).strip().replace(',','').replace('%','')
+            return float(val) if i < len(cells) and val else 0.0
+        except:
+            return 0.0
+
     rows = []
     for cells in lines[6:]:
-        if not cells or len(cells) < 30:
+        if not cells or len(cells) < 40:
             continue
         try:
             imp_str = cells[28].strip().replace(',','')
             clk_str = cells[29].strip().replace(',','')
+            camp_name = cells[4].strip() if len(cells) > 4 else ''
             post_text = cells[21].strip() if len(cells) > 21 else ''
 
             if not imp_str or not clk_str:
                 continue
 
-            imp = float(imp_str)
-            clk = float(clk_str)
-
-            # Inferisci camp_id dal post_text
+            # Inferisci camp_id dal campaign name
             camp_id = '0'
-            if 'MRO' in post_text:
+            if 'MRO' in camp_name or 'MRO' in post_text:
                 camp_id = '987808183'
-            elif 'Amplification' in post_text or 'Always On' in post_text:
+            elif 'Amplification' in camp_name or 'Always On' in camp_name:
                 camp_id = '1056604124'
 
             rows.append({
                 'camp_id': camp_id,
-                'ad_id': cells[19].strip() if len(cells) > 19 else '',
-                'post_text': post_text,
-                'impressions': imp,
-                'clicks': clk,
-                'ctr': float(cells[30].strip().rstrip('%'))/100 if len(cells) > 30 and cells[30].strip() else 0.0,
+                'camp_name': '',
+                'ad_name': cells[18].strip() if len(cells) > 18 else '',
+                'click_url': cells[24].strip() if len(cells) > 24 else '',
+                'spent': fv(cells, 27),
+                'impressions': fv(cells, 28),
+                'clicks': fv(cells, 29),
+                'reactions': fv(cells, 33),
+                'comments': fv(cells, 34),
+                'shares': fv(cells, 35),
+                'er': fv(cells, 40),
+                'reach': fv(cells, 63),
+                'leads': 0.0,
             })
         except (ValueError, IndexError):
             pass
@@ -1247,15 +1259,20 @@ def parse_creative_csv(path):
         try: return float(clean(cells[i]).replace(',','').replace('%','')) if i < len(cells) else 0.0
         except: return 0.0
 
-    # Raggruppa linee per creative (prima riga = 23 celle con Campaign ID numerico)
+    # Raggruppa linee per creative (prima riga = almeno 20 celle con Campaign ID numerico)
     creatives, current = [], None
     for l in lines[header_idx+1:]:
         cells = l.split('\t')
-        if len(cells) >= 23 and clean(cells[3]).isdigit():
+        if len(cells) >= 20 and clean(cells[3]).isdigit():
             if current: creatives.append(current)
-            current = {'first': cells, 'last': None}
+            current = {'first': cells, 'last': None, 'text_lines': []}
         elif current and len(cells) >= 50:
             current['last'] = cells
+        elif current and 1 <= len(cells) < 20:
+            # Raccogli righe di testo dell'ad (hanno 1-19 celle)
+            text = ' '.join(cells).strip()
+            if text and text != '...':  # Salta righe vuote o placeholder
+                current['text_lines'].append(text)
     if current: creatives.append(current)
 
     rows = []
@@ -1264,11 +1281,13 @@ def parse_creative_csv(path):
         if not l: continue
         # Offset: l'ultima riga inizia da col 22 dell'header (Ad Introduction Text)
         # → click_url=l[3] (header 25), spent=l[6] (28), imp=l[7] (29)...
+        post_text = ' '.join(c.get('text_lines', [])) if c.get('text_lines') else ''
         rows.append({
             'camp_id':    clean(f[3]),
             'camp_name':  clean(f[4]),
             'ad_name':    clean(f[19]) if len(f) > 19 else '',
             'click_url':  clean(l[3])  if len(l) > 3  else '',
+            'post_text':  post_text[:500],  # Limita a 500 caratteri per il matching
             'spent':      fv(l, 6),
             'impressions':fv(l, 7),
             'clicks':     fv(l, 8),
