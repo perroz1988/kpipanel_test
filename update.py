@@ -1477,7 +1477,7 @@ def main():
             else:
                 print('  ⚠  FILE MANCANTE: Creative Performance CSV')
                 print('     → Scarica da LinkedIn Campaign Manager → Reports → Creative Performance')
-                print(f'     → Rinomina/metti in: inbox/rs-italia/')
+                print(f'     → Rinomina/metti in: inbox/')
 
     # ══════════════════════════════════════════════════════════════
     # CLIENTE 2 — OPTIMEDIA
