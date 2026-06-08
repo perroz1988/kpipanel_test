@@ -56,8 +56,8 @@ ARCHIVE_CAMPAGNE = os.path.join(BASE, 'archive', 'rs-italia', 'campagne')
 ARCHIVE_PDF      = os.path.join(BASE, 'archive', 'pdf')
 ARCHIVE_ROOT     = os.path.join(BASE, 'archive', 'rs-italia')
 TRASH            = os.path.join(BASE, '_trash')
+INBOX            = os.path.join(BASE, 'inbox')
 INBOX_RS         = os.path.join(BASE, 'inbox', 'rs-italia')
-INBOX            = INBOX_RS   # alias legacy
 DASHBOARD        = os.path.join(BASE, 'dashboard.html')
 HISTORY_JSON     = os.path.join(BASE, 'rs_history.json')
 CAMP_HISTORY_JSON= os.path.join(BASE, 'camp_history.json')
@@ -1181,6 +1181,55 @@ def parse_campaign_csv(path):
     }
 
 
+def parse_creative_performance_report(path):
+    """Parsa il Creative Performance Report di LinkedIn (usa CSV reader).
+    Colonna 28: Impressions, 29: Clicks, 30: CTR, 21: Ad Introduction Text (post identifier)."""
+    import csv
+    with open(path, 'r', encoding='utf-16') as f:
+        reader = csv.reader(f, delimiter='\t')
+        lines = list(reader)
+
+    # Riga 5 = header (0-indexed)
+    if len(lines) < 6:
+        return []
+
+    # Colonne: 19=Ad ID, 21=Ad Introduction Text (post id), 28=Impressions, 29=Clicks, 30=CTR
+    rows = []
+    for cells in lines[6:]:
+        if not cells or len(cells) < 30:
+            continue
+        try:
+            imp_str = cells[28].strip().replace(',','')
+            clk_str = cells[29].strip().replace(',','')
+            post_text = cells[21].strip() if len(cells) > 21 else ''
+
+            if not imp_str or not clk_str:
+                continue
+
+            imp = float(imp_str)
+            clk = float(clk_str)
+
+            # Inferisci camp_id dal post_text
+            camp_id = '0'
+            if 'MRO' in post_text:
+                camp_id = '987808183'
+            elif 'Amplification' in post_text or 'Always On' in post_text:
+                camp_id = '1056604124'
+
+            rows.append({
+                'camp_id': camp_id,
+                'ad_id': cells[19].strip() if len(cells) > 19 else '',
+                'post_text': post_text,
+                'impressions': imp,
+                'clicks': clk,
+                'ctr': float(cells[30].strip().rstrip('%'))/100 if len(cells) > 30 and cells[30].strip() else 0.0,
+            })
+        except (ValueError, IndexError):
+            pass
+
+    return rows
+
+
 def parse_creative_csv(path):
     """Legge il Creative/Ad Performance Report di LinkedIn Campaign Manager.
     Il file ha righe multi-line: prima riga (23 celle) + testo ad + ultima riga (metriche).
@@ -1238,15 +1287,35 @@ def update_creative_data(creatives):
     with open(DASHBOARD, 'r', encoding='utf-8') as f:
         html = f.read()
     marker = 'const CREATIVE_DATA = '
-    end    = ';\n\nconst CAMP_DATA'
     idx = html.find(marker)
     if idx < 0:
         return False
-    end_idx = html.find(end, idx)
-    if end_idx < 0: return False
-    html = html[:idx] + marker + json.dumps(creatives, ensure_ascii=False) + html[end_idx:]
+
+    # Trova il ; che chiude il blocco CREATIVE_DATA
+    semi_idx = html.find(';', idx + len(marker))
+    if semi_idx < 0:
+        return False
+
+    # Verifica che sia seguito da const CAMP_DATA (con newline variabili)
+    after_semi = html[semi_idx+1:semi_idx+100]
+    if 'const CAMP_DATA' not in after_semi:
+        return False
+
+    # Trova dove inizia const CAMP_DATA
+    camp_idx = html.find('const CAMP_DATA', semi_idx)
+    if camp_idx < 0:
+        return False
+
+    # Sostituisci il contenuto di CREATIVE_DATA (tra marker e ;)
+    # Mantieni tutto fino al ; e poi fino a const CAMP_DATA
+    new_html = (html[:idx] +
+                marker +
+                json.dumps(creatives, ensure_ascii=False) +
+                html[semi_idx:camp_idx])  # Il ; più i newline
+    new_html += html[camp_idx:]  # const CAMP_DATA in poi
+
     with open(DASHBOARD, 'w', encoding='utf-8') as f:
-        f.write(html)
+        f.write(new_html)
     return True
 
 
@@ -1464,10 +1533,21 @@ def main():
 
             # Creative Performance (per-post paid data)
             creative_files = sorted(glob.glob(os.path.join(ARCHIVE_CAMPAGNE, '????-??-??_creative_performance.csv')))
+            use_inbox = False
+            # Fallback: cerca in inbox/
+            if not creative_files:
+                creative_files = sorted(glob.glob(os.path.join(INBOX, 'account_*creative_performance*.csv')))
+                use_inbox = True
+
             if creative_files:
                 try:
-                    all_creatives = parse_creative_csv(creative_files[-1])
-                    krein_creatives = [r for r in all_creatives if r['camp_id'] in {'987808183','1056604124'}]
+                    # Usa parser diverso a seconda della fonte
+                    if use_inbox:
+                        all_creatives = parse_creative_performance_report(creative_files[-1])
+                    else:
+                        all_creatives = parse_creative_csv(creative_files[-1])
+
+                    krein_creatives = [r for r in all_creatives if r.get('camp_id') in {'987808183','1056604124'}]
                     if update_creative_data(krein_creatives):
                         print(f'  CREATIVE_DATA ✓  ({len(krein_creatives)} creative Krein)')
                     else:
@@ -1477,7 +1557,7 @@ def main():
             else:
                 print('  ⚠  FILE MANCANTE: Creative Performance CSV')
                 print('     → Scarica da LinkedIn Campaign Manager → Reports → Creative Performance')
-                print(f'     → Rinomina/metti in: inbox/')
+                print(f'     → Salva in: inbox/')
 
     # ══════════════════════════════════════════════════════════════
     # CLIENTE 2 — OPTIMEDIA
