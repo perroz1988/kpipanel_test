@@ -1541,11 +1541,25 @@ function renderAmplificazione(){
   // Filtra campagne da renderizzare
   const campsToShow = state.amplificazioneFilter==='all' ? Object.keys(CAMPS) : [state.amplificazioneFilter];
 
+  // Summary filtri
+  const campFilter = state.amplificazioneFilter === 'all' ? 'Tutte le campagne' : CAMPS[state.amplificazioneFilter]?.name || 'N/A';
+  const periodLabel2 = state.period === 'settimanale' ? 'Ultima settimana' : state.period === 'mensile' ? 'Ultimo mese' : state.period === 'custom' ? 'Periodo custom' : 'Periodo storico';
+
   const html = `
     <div style="margin-bottom:24px">
       <h2 style="margin:0 0 8px 0">Come legge l'amplificazione Krein</h2>
-      <p style="color:var(--text-2);margin:0;font-size:13px">Periodo: <strong>${periodLabel}</strong></p>
-      <p style="color:var(--text-2);margin:4px 0 0 0;font-size:12px">Post amplificati per campagna: organico (pubblico non pagato) + paid (Always On). Dati da Creative Report.</p>
+      <div style="display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap">
+        <div style="padding:8px 12px;background:var(--surface-mid);border-radius:6px;border-left:3px solid var(--primary)">
+          <div style="font-size:11px;color:var(--text-2);margin-bottom:2px">PERIODO</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text)">${periodLabel2}</div>
+          <div style="font-size:11px;color:var(--text-2);margin-top:2px">${periodLabel}</div>
+        </div>
+        <div style="padding:8px 12px;background:var(--surface-mid);border-radius:6px;border-left:3px solid var(--li-blue)">
+          <div style="font-size:11px;color:var(--text-2);margin-bottom:2px">CAMPAGNA</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text)">${campFilter}</div>
+        </div>
+      </div>
+      <p style="color:var(--text-2);margin:0;font-size:12px">Post amplificati per campagna: organico (pubblico non pagato) + paid (Always On). Dati da Creative Report.</p>
       <div style="margin-top:16px;display:grid;gap:8px">
         ${statsHtml}
       </div>
