@@ -1517,6 +1517,20 @@ function renderAmplificazione(){
 
   const periodLabel = `${fmtDate(range.from)} → ${fmtDate(range.to)}`;
 
+  // Statistiche aggregate per campagna
+  const statsHtml = Object.keys(CAMPS).map(campId => {
+    const camp = CAMPS[campId];
+    const total = totals[campId];
+    return `
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:16px;padding:12px;background:var(--surface-mid);border-radius:8px;border-left:4px solid ${camp.color}">
+        <div><strong>${camp.name}</strong></div>
+        <div style="text-align:right"><span style="color:var(--text-2);font-size:12px">Post</span><br><strong>${total.posts}</strong></div>
+        <div style="text-align:right"><span style="color:var(--text-2);font-size:12px">Impressioni</span><br><strong>${total.imp.toLocaleString()}</strong></div>
+        <div style="text-align:right"><span style="color:var(--text-2);font-size:12px">Click</span><br><strong>${total.clk.toLocaleString()}</strong></div>
+      </div>
+    `;
+  }).join('');
+
   // Genera bottoni filtro campagna
   const filterBtns = `
     <button onclick="state.amplificazioneFilter='all';renderAmplificazione()" style="padding:8px 16px;margin-right:8px;border:1px solid var(--border);background:${state.amplificazioneFilter==='all'?'var(--primary)':'var(--surface-mid)'};color:${state.amplificazioneFilter==='all'?'white':'var(--text)'};border-radius:6px;cursor:pointer;font-size:13px;font-weight:${state.amplificazioneFilter==='all'?'700':'500'}">Tutte</button>
@@ -1532,6 +1546,9 @@ function renderAmplificazione(){
       <h2 style="margin:0 0 8px 0">Come legge l'amplificazione Krein</h2>
       <p style="color:var(--text-2);margin:0;font-size:13px">Periodo: <strong>${periodLabel}</strong></p>
       <p style="color:var(--text-2);margin:4px 0 0 0;font-size:12px">Post amplificati per campagna: organico (pubblico non pagato) + paid (Always On). Dati da Creative Report.</p>
+      <div style="margin-top:16px;display:grid;gap:8px">
+        ${statsHtml}
+      </div>
       <div style="margin-top:16px;display:flex;gap:8px">
         ${filterBtns}
       </div>
