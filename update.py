@@ -386,30 +386,31 @@ def _apply_krein_filter(camp_data):
 
 def rebuild_camp_history():
     """Ricostruisce camp_history.json da TUTTI i CSV in archive/campagne/.
-    Incrementale: non sovrascrive righe già presenti."""
-    existing = {}
+    Scarta doppioni: per (camp_id, date), il CSV più recente vince."""
+    rows_by_key = {}  # Key: (camp_id, date) → ultimo valore vince
+
     # Carica storico esistente
     if os.path.exists(CAMP_HISTORY_JSON):
         try:
             with open(CAMP_HISTORY_JSON, 'r', encoding='utf-8') as f:
                 for r in json.load(f).get('daily', []):
-                    key = f"{r['camp_id']}|{r['date']}|{r.get('camp_name','')[:30]}"
-                    existing[key] = r
+                    key = (r['camp_id'], r['date'])
+                    rows_by_key[key] = r
         except Exception:
             pass
 
-    # Processa tutti i CSV campagne in archivio
+    # Processa CSV in ordine cronologico (il CSV più recente sovrascrive)
     all_csvs = sorted(glob.glob(os.path.join(ARCHIVE_CAMPAGNE, '????-??-??_campagne.csv')))
     for csv_path in all_csvs:
         try:
             camp_data = _apply_krein_filter(parse_campaign_csv(csv_path))
             for r in camp_data['daily']:
-                key = f"{r['camp_id']}|{r['date']}|{r.get('camp_name','')[:30]}"
-                existing[key] = r
+                key = (r['camp_id'], r['date'])
+                rows_by_key[key] = r  # CSV più recente sovrascrive
         except Exception as e:
             print(f'    WARN storico {os.path.basename(csv_path)}: {e}')
 
-    sorted_rows = sorted(existing.values(), key=lambda x: x['date'])
+    sorted_rows = sorted(rows_by_key.values(), key=lambda x: x['date'])
     all_dates   = [r['date'] for r in sorted_rows]
     history = {
         'meta': {
