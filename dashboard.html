@@ -1549,8 +1549,11 @@ function renderAmplificazione(){
       <div style="margin-top:16px;display:grid;gap:8px">
         ${statsHtml}
       </div>
-      <div style="margin-top:16px;display:flex;gap:8px">
-        ${filterBtns}
+      <div style="margin-top:16px;display:flex;gap:8px;justify-content:space-between;align-items:center">
+        <div style="display:flex;gap:8px">
+          ${filterBtns}
+        </div>
+        <button onclick="exportAmplificazioneCSV()" style="padding:8px 16px;border:1px solid var(--border);background:var(--surface-mid);color:var(--text);border-radius:6px;cursor:pointer;font-size:13px;font-weight:500">📥 Esporta CSV</button>
       </div>
     </div>
     ${campsToShow.map(campId => renderCamp(campId)).join('')}
@@ -2271,6 +2274,71 @@ function exportPostsCSV(){
   const a = document.createElement('a');
   a.href = url;
   a.download = `RS-Italia-Post-${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(`<b>CSV esportato:</b> ${a.download}`, 'success');
+}
+
+function exportAmplificazioneCSV(){
+  const range = getRange();
+  const inRange = d => d>=range.from && d<=range.to;
+  const postsOrganici = RS_DATA.posts.filter(p => p.tipo === 'Organico' && inRange(new Date(p.data_creazione)));
+
+  const CAMPS = {
+    '1056604124': { id: '1056604124', name: 'Amplification Always On' },
+    '987808183':  { id: '987808183', name: 'MRO Survey' }
+  };
+
+  const postTextsInPeriod = new Set(postsOrganici.map(p => p.titolo));
+  const normalizeText = t => (t||'').replace(/\s+/g,' ').trim().substring(0,60);
+
+  const rows = [];
+  for(const campId of Object.keys(CAMPS)){
+    const camp = CAMPS[campId];
+    const creatives = (CREATIVE_DATA||[]).filter(c => c.camp_id === campId && postTextsInPeriod.has(c.post_text));
+    const posts = [...new Set(creatives.map(c => c.post_text))].sort();
+
+    for(const postText of posts){
+      const creativeMatches = (CREATIVE_DATA||[]).filter(c => c.post_text === postText && c.camp_id === campId);
+      const spn_imp = creativeMatches.reduce((s,c)=>s+(c.impressions||0),0);
+      const spn_clk = creativeMatches.reduce((s,c)=>s+(c.clicks||0),0);
+      const spn_ctr = spn_imp > 0 ? (spn_clk / spn_imp) * 100 : 0;
+
+      const orgMatch = postsOrganici.find(p => normalizeText(p.titolo).includes(normalizeText(postText).substring(0,30)));
+      const org_imp = orgMatch ? orgMatch.impressioni : 0;
+      const org_clk = orgMatch ? orgMatch.clic : 0;
+      const org_er = org_imp > 0 ? ((orgMatch.reazioni||0) + (orgMatch.commenti||0) + (orgMatch.diffusioni||0)) / org_imp * 100 : 0;
+
+      const tot_imp = org_imp + spn_imp;
+      const tot_clk = org_clk + spn_clk;
+      const tot_er = tot_imp > 0 ? (((orgMatch?.reazioni||0) + (orgMatch?.commenti||0) + (orgMatch?.diffusioni||0)) / tot_imp) * 100 : 0;
+
+      rows.push({
+        campagna: camp.name,
+        post: postText.substring(0,80),
+        org_imp, org_clk, org_er,
+        spn_imp, spn_clk, spn_ctr,
+        tot_imp, tot_clk, tot_er
+      });
+    }
+  }
+
+  if(!rows.length){ showToast('Nessun dato da esportare nel periodo corrente.'); return; }
+
+  const headers = ['Campagna','Post','Imp Org','Click Org','ER% Org','Imp Paid','Click Paid','CTR% Paid','Imp Tot','Click Tot','ER% Tot'];
+  const esc = v => `"${(v==null?'':v+'').replace(/"/g,'""')}"`;
+  const csvRows = rows.map(r=>[
+    r.campagna, r.post, r.org_imp, r.org_clk, nfDec.format(r.org_er),
+    r.spn_imp, r.spn_clk, nfDec.format(r.spn_ctr),
+    r.tot_imp, r.tot_clk, nfDec.format(r.tot_er)
+  ].map(esc).join(','));
+
+  const csv = [headers.map(esc).join(','), ...csvRows].join('\n');
+  const blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `RS-Italia-Amplificazione-${new Date().toISOString().slice(0,10)}.csv`;
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
   showToast(`<b>CSV esportato:</b> ${a.download}`, 'success');
