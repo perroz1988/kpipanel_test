@@ -1420,19 +1420,15 @@ function renderContenuti(r){
 
 /* ---------- AMPLIFICAZIONE KREIN ---------- */
 function renderAmplificazione(){
-  // Applica filtro periodo come negli altri tab
-  const range = getRange();
-  const inRange = d => d>=range.from && d<=range.to;
-
-  // Filtra post organici per periodo
-  const postsOrganici = RS_DATA.posts.filter(p => p.tipo === 'Organico' && inRange(new Date(p.data_creazione)));
+  // Mostra sempre TUTTI i post amplificati (non filtra per periodo generale)
+  const postsOrganici = RS_DATA.posts.filter(p => p.tipo === 'Organico');
 
   const CAMPS = {
     '1056604124': { id: '1056604124', name: 'Amplification Always On', color: '#4A00FF' },
     '987808183':  { id: '987808183', name: 'MRO Survey', color: '#FF6B35' }
   };
 
-  // Estrai post per campagna da CREATIVE_DATA (solo quelli nel periodo)
+  // Estrai post per campagna da CREATIVE_DATA
   const postTextsInPeriod = new Set(postsOrganici.map(p => p.titolo));
   const postsBycamp = {};
   for(const campId of Object.keys(CAMPS)) {
@@ -1538,8 +1534,6 @@ function renderAmplificazione(){
     `;
   };
 
-  const periodLabel = `${fmtDate(range.from)} → ${fmtDate(range.to)}`;
-
   // Statistiche aggregate per campagna
   const statsHtml = Object.keys(CAMPS).map(campId => {
     const camp = CAMPS[campId];
@@ -1566,17 +1560,11 @@ function renderAmplificazione(){
 
   // Summary filtri
   const campFilter = state.amplificazioneFilter === 'all' ? 'Tutte le campagne' : CAMPS[state.amplificazioneFilter]?.name || 'N/A';
-  const periodLabel2 = state.period === 'settimanale' ? 'Ultima settimana' : state.period === 'mensile' ? 'Ultimo mese' : state.period === 'custom' ? 'Periodo custom' : 'Periodo storico';
 
   const html = `
     <div style="margin-bottom:24px">
       <h2 style="margin:0 0 8px 0">Come legge l'amplificazione Krein</h2>
       <div style="display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap">
-        <div style="padding:8px 12px;background:var(--surface-mid);border-radius:6px;border-left:3px solid var(--primary)">
-          <div style="font-size:11px;color:var(--text-2);margin-bottom:2px">PERIODO</div>
-          <div style="font-size:13px;font-weight:600;color:var(--text)">${periodLabel2}</div>
-          <div style="font-size:11px;color:var(--text-2);margin-top:2px">${periodLabel}</div>
-        </div>
         <div style="padding:8px 12px;background:var(--surface-mid);border-radius:6px;border-left:3px solid var(--li-blue)">
           <div style="font-size:11px;color:var(--text-2);margin-bottom:2px">CAMPAGNA</div>
           <div style="font-size:13px;font-weight:600;color:var(--text)">${campFilter}</div>
@@ -2317,9 +2305,8 @@ function exportPostsCSV(){
 }
 
 function exportAmplificazioneCSV(){
-  const range = getRange();
-  const inRange = d => d>=range.from && d<=range.to;
-  const postsOrganici = RS_DATA.posts.filter(p => p.tipo === 'Organico' && inRange(new Date(p.data_creazione)));
+  // Esporta TUTTI i post amplificati (non filtra per periodo)
+  const postsOrganici = RS_DATA.posts.filter(p => p.tipo === 'Organico');
 
   const CAMPS = {
     '1056604124': { id: '1056604124', name: 'Amplification Always On' },
