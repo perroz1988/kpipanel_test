@@ -1447,37 +1447,13 @@ def main():
                 camp_files = sorted(glob.glob(os.path.join(ARCHIVE_ROOT, '*campaign_performance_report*.csv')))
             if camp_files:
                 try:
-                    # Ricostruisci storico da TUTTI i CSV
-                    camp_history = rebuild_camp_history()
+                    # Carica DIRETTAMENTE dal CSV più recente (unica fonte di verità)
+                    camp_data = parse_campaign_csv(camp_files[-1])
+                    camp_data = _apply_krein_filter(camp_data)
 
-                    # Prepara CAMP_DATA dal totale storico (non solo l'ultimo CSV)
-                    camp_meta_by_id = {}
-                    for r in camp_history['daily']:
-                        cid = r.get('camp_id')
-                        if cid not in camp_meta_by_id:
-                            camp_meta_by_id[cid] = {
-                                'id': cid,
-                                'name': r.get('camp_name', ''),
-                                'objective': '',
-                                'status': '',
-                                'budget': 0,
-                                'start': '',
-                                'end': '',
-                                'currency': 'GBP'
-                            }
-
-                    camp_data = {
-                        'meta': {
-                            'report_start': camp_history['meta']['data_min'],
-                            'report_end': camp_history['meta']['data_max'],
-                            'generated': datetime.now().strftime('%Y-%m-%d'),
-                            'currency': 'GBP'
-                        },
-                        'camp_meta': list(camp_meta_by_id.values()),
-                        'daily': camp_history['daily']
-                    }
+                    # Salva in dashboard.html
                     update_camp_data(camp_data)
-                    print(f'  CAMP_DATA ✓  ({len(camp_data["camp_meta"])} campagne Krein · {camp_history["meta"]["data_min"]} → {camp_history["meta"]["data_max"]})')
+                    print(f'  CAMP_DATA ✓  ({len(camp_data["camp_meta"])} campagne Krein · {camp_data["meta"]["report_start"]} → {camp_data["meta"]["report_end"]})')
                 except Exception as e:
                     print(f'  CAMP_DATA WARN: {e}')
             else:
@@ -1560,7 +1536,7 @@ def main():
     commit_msg = f'Update dati: {data_max}'
     print(f'\nDeploy automatico...')
     try:
-        files_to_add = ['dashboard.html', 'rs_history.json', 'camp_history.json', 'optimedia.html']
+        files_to_add = ['dashboard.html', 'rs_history.json', 'optimedia.html']
         subprocess.run(['git', 'add'] + files_to_add, cwd=BASE, check=True)
         result = subprocess.run(['git', 'diff', '--cached', '--quiet'], cwd=BASE)
         if result.returncode != 0:
