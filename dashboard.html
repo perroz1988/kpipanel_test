@@ -1475,11 +1475,26 @@ function renderAmplificazione(){
       const orgMatch = postsOrganici.find(p => normalizeText(p.titolo).includes(normalizeText(postText).substring(0,30)));
       const org_imp = orgMatch ? orgMatch.impressioni : 0;
       const org_clk = orgMatch ? orgMatch.clic : 0;
-      const org_er = org_imp > 0 ? ((orgMatch.reazioni||0) + (orgMatch.commenti||0) + (orgMatch.diffusioni||0)) / org_imp : 0;
+      const org_react = orgMatch ? (orgMatch.reazioni||0) : 0;
+      const org_comm = orgMatch ? (orgMatch.commenti||0) : 0;
+      const org_share = orgMatch ? (orgMatch.diffusioni||0) : 0;
+      const org_er = org_imp > 0 ? (org_react + org_comm + org_share) / org_imp : 0;
 
       const tot_imp = org_imp + spn_imp;
       const tot_clk = org_clk + spn_clk;
       const tot_er = tot_imp > 0 ? (((orgMatch?.reazioni||0) + (orgMatch?.commenti||0) + (orgMatch?.diffusioni||0)) / tot_imp) : 0;
+
+      // Dettagli creatività sponsorizzate
+      const creativeDetails = creativeMatches.map(c => `
+        <div style="padding:8px;background:white;border-radius:4px;border-left:2px solid #FF6B35;margin-top:6px;font-size:11px">
+          <div style="color:var(--text-2);margin-bottom:2px"><strong>Ad ID:</strong> ${c.ad_id}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px">
+            <div><span style="color:var(--text-2)">Imp</span><br><strong>${(c.impressions||0).toLocaleString()}</strong></div>
+            <div><span style="color:var(--text-2)">Click</span><br><strong>${(c.clicks||0).toLocaleString()}</strong></div>
+            <div><span style="color:var(--text-2)">CTR</span><br><strong>${c.ctr ? (c.ctr*100).toFixed(1) : '0'}%</strong></div>
+          </div>
+        </div>
+      `).join('');
 
       return `
         <div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border-lt)">
@@ -1487,18 +1502,23 @@ function renderAmplificazione(){
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
             <div style="padding:10px;background:var(--surface-mid);border-radius:6px;border:1px solid var(--border)">
               <div style="font-size:10px;color:var(--text-2);font-weight:600;margin-bottom:4px">ORG</div>
-              <div style="font-size:14px;font-weight:700;color:var(--text)">${org_imp.toLocaleString()}</div>
-              <div style="font-size:11px;color:var(--text-2)">ER ${(org_er*100).toFixed(1)}%</div>
+              <div style="font-size:13px;font-weight:700;color:var(--text)">${org_imp.toLocaleString()} imp</div>
+              <div style="font-size:10px;color:var(--text-2);margin-top:4px">${org_clk.toLocaleString()} click</div>
+              <div style="font-size:10px;color:var(--text-2);margin-top:2px">❤️ ${org_react} 💬 ${org_comm} 🔗 ${org_share}</div>
+              <div style="font-size:11px;color:var(--text-2);margin-top:4px;padding-top:4px;border-top:1px solid var(--border)">ER ${(org_er*100).toFixed(1)}%</div>
             </div>
             <div style="padding:10px;background:var(--surface-mid);border-radius:6px;border:1px solid var(--border)">
               <div style="font-size:10px;color:var(--text-2);font-weight:600;margin-bottom:4px">PAID</div>
-              <div style="font-size:14px;font-weight:700;color:var(--text)">${spn_imp.toLocaleString()}</div>
-              <div style="font-size:11px;color:var(--text-2)">CTR ${(spn_ctr*100).toFixed(1)}%</div>
+              <div style="font-size:13px;font-weight:700;color:var(--text)">${spn_imp.toLocaleString()} imp</div>
+              <div style="font-size:10px;color:var(--text-2);margin-top:4px">${spn_clk.toLocaleString()} click</div>
+              <div style="font-size:11px;color:var(--text-2);margin-top:4px;padding-top:4px;border-top:1px solid var(--border)">CTR ${(spn_ctr*100).toFixed(1)}%</div>
+              ${creativeDetails}
             </div>
             <div style="padding:10px;background:oklch(15% 0.08 250);border-radius:6px;border:1px solid var(--border);color:white">
               <div style="font-size:10px;color:rgba(255,255,255,0.7);font-weight:600;margin-bottom:4px">TOT</div>
-              <div style="font-size:14px;font-weight:700">${tot_imp.toLocaleString()}</div>
-              <div style="font-size:11px;color:rgba(255,255,255,0.8)">ER ${(tot_er*100).toFixed(1)}%</div>
+              <div style="font-size:13px;font-weight:700">${tot_imp.toLocaleString()} imp</div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.8);margin-top:4px">${tot_clk.toLocaleString()} click</div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.8);margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,255,255,0.2)">ER ${(tot_er*100).toFixed(1)}%</div>
             </div>
           </div>
         </div>
