@@ -1452,7 +1452,10 @@ function renderAmplificazione(){
   }
 
   if(!Object.values(postsBycamp).some(p=>p.length)) {
-    document.getElementById('amplificazioneDetail').innerHTML = '<div class="empty-state">Nessun post amplificato trovato.</div>';
+    const orgCount = postsOrganici.length;
+    const creativeCount = (CREATIVE_DATA||[]).length;
+    const debug = `Post organici trovati: ${orgCount} | CREATIVE_DATA: ${creativeCount} | Periodo: ${periodLabel}`;
+    document.getElementById('amplificazioneDetail').innerHTML = `<div class="empty-state">Nessun post amplificato trovato.<br><small style="color:var(--text-2);margin-top:8px;display:block">${debug}</small></div>`;
     return;
   }
 
