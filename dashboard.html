@@ -932,6 +932,7 @@ const state = {
   contentFilter:'all', // all | org | spon
   postsSort:{ col:'data', dir:'desc' },
   selectedPostLink:null,
+  amplificazioneFilter:'all', // all | 1056604124 | 987808183
 };
 const charts = {};
 
@@ -1515,13 +1516,27 @@ function renderAmplificazione(){
   };
 
   const periodLabel = `${fmtDate(range.from)} → ${fmtDate(range.to)}`;
+
+  // Genera bottoni filtro campagna
+  const filterBtns = `
+    <button onclick="state.amplificazioneFilter='all';renderAmplificazione()" style="padding:8px 16px;margin-right:8px;border:1px solid var(--border);background:${state.amplificazioneFilter==='all'?'var(--primary)':'var(--surface-mid)'};color:${state.amplificazioneFilter==='all'?'white':'var(--text)'};border-radius:6px;cursor:pointer;font-size:13px;font-weight:${state.amplificazioneFilter==='all'?'700':'500'}">Tutte</button>
+    <button onclick="state.amplificazioneFilter='1056604124';renderAmplificazione()" style="padding:8px 16px;margin-right:8px;border:1px solid var(--border);background:${state.amplificazioneFilter==='1056604124'?'#4A00FF':'var(--surface-mid)'};color:${state.amplificazioneFilter==='1056604124'?'white':'var(--text)'};border-radius:6px;cursor:pointer;font-size:13px;font-weight:${state.amplificazioneFilter==='1056604124'?'700':'500'}">Amplification Always On</button>
+    <button onclick="state.amplificazioneFilter='987808183';renderAmplificazione()" style="padding:8px 16px;border:1px solid var(--border);background:${state.amplificazioneFilter==='987808183'?'#FF6B35':'var(--surface-mid)'};color:${state.amplificazioneFilter==='987808183'?'white':'var(--text)'};border-radius:6px;cursor:pointer;font-size:13px;font-weight:${state.amplificazioneFilter==='987808183'?'700':'500'}">MRO Survey</button>
+  `;
+
+  // Filtra campagne da renderizzare
+  const campsToShow = state.amplificazioneFilter==='all' ? Object.keys(CAMPS) : [state.amplificazioneFilter];
+
   const html = `
     <div style="margin-bottom:24px">
       <h2 style="margin:0 0 8px 0">Come legge l'amplificazione Krein</h2>
       <p style="color:var(--text-2);margin:0;font-size:13px">Periodo: <strong>${periodLabel}</strong></p>
       <p style="color:var(--text-2);margin:4px 0 0 0;font-size:12px">Post amplificati per campagna: organico (pubblico non pagato) + paid (Always On). Dati da Creative Report.</p>
+      <div style="margin-top:16px;display:flex;gap:8px">
+        ${filterBtns}
+      </div>
     </div>
-    ${Object.keys(CAMPS).map(campId => renderCamp(campId)).join('')}
+    ${campsToShow.map(campId => renderCamp(campId)).join('')}
   `;
 
   document.getElementById('amplificazioneDetail').innerHTML = html;
